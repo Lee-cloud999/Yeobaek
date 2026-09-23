@@ -207,9 +207,11 @@ async function login(email, password) {
     setSyncStatus("로그인 중…");
     await signInWithEmailAndPassword(auth, email.trim(), password);
   } catch(e) {
-    console.error(e);
-    setSyncStatus("로그인 실패", "error");
-    alert("로그인하지 못했어요. 이메일과 비밀번호를 확인해주세요.");
+    console.error("Firebase login error:", e);
+    const code = e?.code || "unknown-error";
+    const message = e?.message || "";
+    setSyncStatus("로그인 실패 · " + code, "error");
+    alert("로그인하지 못했어요.\n\n오류 코드: " + code + (message ? "\n\n" + message : ""));
   }
 }
 window.yeobaekCloud = { login, logout:()=>signOut(auth), syncNow };

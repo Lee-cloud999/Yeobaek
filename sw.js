@@ -1,5 +1,5 @@
-const CACHE='yeobaek-v5-email-sync-20260923';
-const APP=['./?v=5e','./index.html?v=5e','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const CACHE='yeobaek-v5-1-login-debug-20260923';
+const APP=['./?v=5-1','./index.html?v=5-1','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -16,9 +16,9 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=5e',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=5-1',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=5e'))
+      }).catch(()=>caches.match('./index.html?v=5-1'))
     );
     return;
   }
