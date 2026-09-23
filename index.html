@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f1ea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="여백">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>여백</title>
+<style>
+:root{--ink:#59463b;--muted:#8e7b70;--line:#d6c6ba;--brown:#866b59;--chip:#dfd0c5}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#e8e1da}
+body{color:var(--ink);font-family:"MaruBuri","AppleMyungjo","Noto Serif KR","Batang",serif}
+.app{width:min(100%,480px);min-height:100dvh;margin:auto;background:linear-gradient(#fbf7f2,#f5eee7);padding-bottom:68px}
+.top{padding:22px 18px 12px;display:grid;grid-template-columns:minmax(0,1fr) minmax(178px,1.35fr);gap:14px}
+.brand{font-size:34px;line-height:1.05;letter-spacing:-2px;margin:2px 0 8px}.intro{font-size:14px;line-height:1.55;white-space:nowrap}
+.datebox{text-align:center}.daterow{height:38px;display:grid;grid-template-columns:38px minmax(104px,1fr) 38px;align-items:center;gap:5px}
+.navbtn{width:38px;height:38px;border:0;border-radius:50%;background:#e7dbd1;color:#6d5547;font:26px/38px Arial;padding:0}
+.date{height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;white-space:nowrap}
+.quote{border-top:1px solid #cbb8aa;margin-top:4px;padding-top:8px;min-height:44px;font-size:12.5px;line-height:1.45}
+main{padding:0 12px}.card{border-radius:17px;padding:13px 14px;margin-bottom:9px;background:rgba(232,220,211,.83)}
+.card:nth-child(2){background:rgba(247,241,236,.9)}.card:nth-child(3){background:rgba(232,220,211,.7)}
+.titleline{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}.kicker{font:bold 9px/1.2 Arial;letter-spacing:1.7px;color:#9a7764}
+.nameRow{display:flex;align-items:baseline;gap:8px;margin-top:2px}h2{font-size:21px;line-height:1.15;font-weight:500;letter-spacing:-.7px;margin:0}.count{font-size:11px;color:#87746a}
+.help{font-size:11.5px;line-height:1.35;margin:4px 0 8px}.plus{width:36px;height:36px;border:0;border-radius:50%;background:var(--brown);color:#fff;font:24px/36px Arial;padding:0}
+input,textarea{width:100%;border:1px solid var(--line);background:rgba(255,252,248,.75);border-radius:10px;color:#55453c;font-family:inherit;font-size:15px;line-height:1.55;padding:9px 11px;outline:none}
+input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:118px}
+.chips{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;overflow:hidden;height:23px;margin-top:5px}.chip{display:inline-flex;align-items:center;gap:3px;background:var(--chip);border-radius:99px;padding:3px 8px;font-size:10.5px;line-height:16px;white-space:nowrap}
+.wordcard{padding:9px 14px}.wordcard .titleline{grid-template-columns:1fr 32px}.wordcard .titlegroup{display:flex;align-items:center;gap:8px}.wordcard .nameRow{margin:0;gap:6px}.wordcard h2{font-size:19px}.wordcard .plus{width:32px;height:32px;font-size:21px;line-height:32px}
+.bottom{position:fixed;z-index:10;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,480px);height:62px;background:rgba(250,246,241,.96);border-top:1px solid #d8c9be;display:grid;grid-template-columns:repeat(4,1fr);backdrop-filter:blur(10px)}
+.tab{border:0;background:none;color:#8d7b70;font-family:inherit;font-size:10px;padding:5px}.tab b{display:block;font-size:18px;font-weight:400;line-height:21px}.tab.active{color:#6f5142}
+.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#6e5749;color:white;border-radius:99px;padding:7px 12px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:20}.toast.show{opacity:.95}
+.view{display:none}.view.active{display:block}.subview{padding:2px 12px 16px}.pagehead{padding:6px 4px 12px}.pagehead h2{font-size:25px;margin:0 0 5px}.pagehead p{font-size:12px;color:var(--muted);margin:0}
+.archiveDay,.settingCard{background:rgba(255,252,248,.72);border:1px solid #dfd2c8;border-radius:15px;padding:13px;margin-bottom:9px}.archiveDate{font-size:15px;margin-bottom:9px}.archiveGroup{margin-top:9px}.archiveLabel,.todaySavedLabel{font:bold 9px Arial;letter-spacing:1.4px;color:#9a7764;margin:8px 0 5px}
+.record{display:flex;gap:8px;align-items:flex-start;background:#f4ebe4;border-radius:10px;padding:8px 9px;margin:5px 0;font-size:13px;line-height:1.5}.recordText{flex:1;white-space:pre-wrap;word-break:break-word}.del{border:0;background:transparent;color:#9a7968;font-size:17px;padding:0 2px}
+.wordRecord{display:inline-flex;align-items:center;gap:3px;background:#e5d7cd;border-radius:99px;padding:5px 7px 5px 10px;margin:3px;font-size:12px}.emptyState{padding:34px 12px;text-align:center;color:#9b8a80;font-size:14px;line-height:1.7}
+.statsGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:rgba(255,252,248,.78);border:1px solid #dfd2c8;border-radius:15px;padding:17px 12px;text-align:center}.stat strong{display:block;font-size:27px;font-weight:500}.stat span{font-size:11px;color:var(--muted)}
+.settingCard h3{font-size:16px;margin:0 0 6px}.settingCard p{font-size:11.5px;line-height:1.55;color:var(--muted);margin:0}.todaySaved{margin-top:7px}.todaySaved:empty{display:none}
+@media(min-width:600px){.app,.bottom{width:min(100%,760px)}.top{padding:26px 28px 14px;grid-template-columns:1fr 1.15fr}main{padding:0 24px}.brand{font-size:38px}.intro{font-size:15px}.date{font-size:17px}.card{padding:14px 18px}.wordcard{padding:9px 18px}}
+</style></head>
+<body><div class="app">
+<header class="top"><div><div class="brand">여백</div><div class="intro">스쳐가는 생각을<br>남겨보세요.</div></div><div class="datebox"><div class="daterow"><button class="navbtn" id="prev">‹</button><div class="date" id="date">오늘</div><button class="navbtn" id="next">›</button></div><div class="quote" id="quote">쓰는 마음이,<br>조금은 가벼워지기를.</div></div></header>
+<main id="writeView" class="view active">
+<section class="card wordcard"><div class="titleline"><div class="titlegroup"><div class="kicker">WORD</div><div class="nameRow"><h2>단어 기록</h2><span class="count" id="wordCount">오늘 0개</span></div></div><button class="plus" id="addWord">＋</button></div><input id="word" autocomplete="off" placeholder="단어를 입력하고 Enter"><div class="chips" id="recent"></div></section>
+<section class="card"><div class="titleline"><div><div class="kicker">SENTENCE</div><h2>문장 기록</h2></div><button class="plus" id="addSentence">＋</button></div><p class="help">기억하고 싶은 한 문장을 적어보세요.</p><textarea id="sentence" placeholder="문장을 입력해 주세요."></textarea><div class="todaySaved" id="todaySentences"></div></section>
+<section class="card paragraph"><div class="titleline"><div><div class="kicker">PARAGRAPH</div><h2>문단 기록</h2></div><button class="plus" id="addParagraph">＋</button></div><p class="help">생각을 조금 더 자유롭게 이어보세요.</p><textarea id="paragraph" placeholder="지금, 하고 싶은 이야기를 적어보세요."></textarea><div class="todaySaved" id="todayParagraphs"></div></section></main>
+<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div id="archiveList"></div></section>
+<section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
+<section id="settingsView" class="view subview"><div class="pagehead"><h2>설정</h2><p>여백 웹앱</p></div><div class="settingCard"><h3>저장 방식</h3><p>현재 기록은 이 기기의 브라우저에 저장됩니다. Firebase 동기화와 전체 백업·복원은 다음 단계에서 연결합니다.</p></div></section>
+<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),weekdays=['일','월','화','수','목','금','토'];let current=new Date();
+const quotes=[['쓰는 마음이,','조금은 가벼워지기를.'],['오늘의 생각이,','조용히 머물기를.'],['흘러가는 생각을,','잠시 붙잡아두세요.'],['생각나는 대로,','가볍게 시작해보세요.'],['아직 문장이 아니어도,','괜찮아요.'],['작은 생각 하나도,','남겨둘 만하니까요.'],['한 단어에서,','이야기가 시작될지도 몰라요.'],['마음에 떠오른 것을,','천천히 놓아보세요.']];
+const q=quotes[Math.floor(Math.random()*quotes.length)];$('#quote').innerHTML=q[0]+'<br>'+q[1];
+const dateKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),key=d=>'yeobaek:'+dateKey(d);
+const blank=()=>({words:[],sentences:[],paragraphs:[],draftSentence:'',draftParagraph:''});
+function load(){try{return Object.assign(blank(),JSON.parse(localStorage.getItem(key(current))||'{}'))}catch(e){return blank()}}function save(x){localStorage.setItem(key(current),JSON.stringify(x))}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),900)}
+function render(){const x=load(),dk=dateKey(current);$('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];$('#wordCount').textContent='오늘 '+x.words.length+'개';$('#recent').innerHTML=x.words.slice(-6).map((w,i)=>{const idx=x.words.length-Math.min(6,x.words.length)+i;return '<span class="chip">'+esc(w)+' <button class="del" onclick="deleteItem(\\''+dk+'\\',\\'words\\','+idx+',false)">×</button></span>'}).join('');$('#sentence').value=x.draftSentence||'';$('#paragraph').value=x.draftParagraph||'';$('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+dk+'\\',\\'sentences\\','+i+',true)">×</button></div>').join(''):'';$('#todayParagraphs').innerHTML=x.paragraphs.length?'<div class="todaySavedLabel">오늘 저장한 문단</div>'+x.paragraphs.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+dk+'\\',\\'paragraphs\\','+i+',true)">×</button></div>').join(''):''}
+function addWord(){const e=$('#word'),v=e.value.trim();if(!v)return;const x=load();x.words.push(v);save(x);e.value='';render();toast('단어를 저장했어요.')}$('#word').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addWord()}});$('#addWord').onclick=addWord;
+$('#sentence').oninput=e=>{const x=load();x.draftSentence=e.target.value;save(x)};$('#paragraph').oninput=e=>{const x=load();x.draftParagraph=e.target.value;save(x)};
+$('#addSentence').onclick=()=>{const x=load(),v=$('#sentence').value.trim();if(!v)return;x.sentences.push(v);x.draftSentence='';save(x);render();toast('문장을 저장했어요.')};$('#addParagraph').onclick=()=>{const x=load(),v=$('#paragraph').value.trim();if(!v)return;x.paragraphs.push(v);x.draftParagraph='';save(x);render();toast('문단을 저장했어요.')};$('#prev').onclick=()=>{current.setDate(current.getDate()-1);render()};$('#next').onclick=()=>{current.setDate(current.getDate()+1);render()};
+function allData(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!k.startsWith('yeobaek:'))continue;try{const x=Object.assign(blank(),JSON.parse(localStorage.getItem(k)||'{}'));if(x.words.length||x.sentences.length||x.paragraphs.length)o.push({date:k.slice(8),data:x})}catch(e){}}return o.sort((a,b)=>b.date.localeCompare(a.date))}
+function prettyDate(s){const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]);return a[0]+'년 '+a[1]+'월 '+a[2]+'일 '+weekdays[d.getDay()]+'요일'}
+function deleteItem(date,type,index,ask=true){if(ask&&!confirm('이 기록을 삭제할까요?'))return;const k='yeobaek:'+date;let x;try{x=Object.assign(blank(),JSON.parse(localStorage.getItem(k)||'{}'))}catch(e){return}if(!x[type]||index<0||index>=x[type].length)return;x[type].splice(index,1);localStorage.setItem(k,JSON.stringify(x));render();renderArchive();renderStats();toast('삭제했어요.')}window.deleteItem=deleteItem;
+function renderArchive(){const list=allData(),b=$('#archiveList');if(!list.length){b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';return}b.innerHTML=list.map(r=>{const d=r.data,date=r.date,w=d.words.length?'<div class="archiveGroup"><div class="archiveLabel">WORD</div>'+d.words.map((v,i)=>'<span class="wordRecord">'+esc(v)+'<button class="del" onclick="deleteItem(\\''+date+'\\',\\'words\\','+i+',false)">×</button></span>').join('')+'</div>':'',s=d.sentences.length?'<div class="archiveGroup"><div class="archiveLabel">SENTENCE</div>'+d.sentences.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+date+'\\',\\'sentences\\','+i+',true)">×</button></div>').join('')+'</div>':'',p=d.paragraphs.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+d.paragraphs.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+date+'\\',\\'paragraphs\\','+i+',true)">×</button></div>').join('')+'</div>':'';return '<div class="archiveDay"><div class="archiveDate">'+prettyDate(date)+'</div>'+w+s+p+'</div>'}).join('')}
+function renderStats(){const l=allData();$('#statDays').textContent=l.length;$('#statWords').textContent=l.reduce((n,r)=>n+r.data.words.length,0);$('#statSentences').textContent=l.reduce((n,r)=>n+r.data.sentences.length,0);$('#statParagraphs').textContent=l.reduce((n,r)=>n+r.data.paragraphs.length,0)}
+function switchView(n){const ids={write:'writeView',archive:'archiveView',stats:'statsView',settings:'settingsView'};document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('#'+ids[n]).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===n));if(n==='archive')renderArchive();if(n==='stats')renderStats();window.scrollTo(0,0)}document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchView(t.dataset.view));
+render();renderArchive();renderStats();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
+</script></body></html>
