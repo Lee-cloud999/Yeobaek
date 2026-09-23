@@ -28,6 +28,22 @@
   src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2") format("woff2");
   font-weight:700;font-style:normal;font-display:swap;
 }
+
+/* v6.2: 오늘 저장한 단어를 개수 제한 없이 모두 보이게 */
+#recent{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:6px !important;
+  max-height:none !important;
+  height:auto !important;
+  overflow:visible !important;
+  white-space:normal !important;
+}
+.wordcard{
+  height:auto !important;
+  min-height:0;
+  overflow:visible !important;
+}
 </style>
 
 <style>
@@ -332,7 +348,7 @@ $('#next').addEventListener('click',()=>{current.setDate(current.getDate()+1);re
 
 function allData(){
  const o=[];
- for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k))continue;try{const x=normalize(JSON.parse(localStorage.getItem(k)||'{}'));if(x.words.length||x.sentences.length||x.paragraphs.length)o.push({date:k.slice(8),data:x})}catch{}}
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k))continue;try{const date=k.slice(8);const x=normalize(JSON.parse(localStorage.getItem(k)||'{}'),date);if(x.words.length||x.sentences.length||x.paragraphs.length)o.push({date,data:x})}catch{}}
  return o.sort((a,b)=>b.date.localeCompare(a.date));
 }
 function prettyDate(s){const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]);return a[0]+'년 '+a[1]+'월 '+a[2]+'일 '+weekdays[d.getDay()]+'요일'}
@@ -355,7 +371,23 @@ function renderArchive(){
  const p=d.paragraphs.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+d.paragraphs.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(date,'paragraphs',i,true)}</div>`).join('')+'</div>':'';
  return `<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`}).join('');
 }
-function renderStats(){const l=allData();$('#statDays').textContent=l.length;$('#statWords').textContent=l.reduce((n,r)=>n+r.data.words.length,0);$('#statSentences').textContent=l.reduce((n,r)=>n+r.data.sentences.length,0);$('#statParagraphs').textContent=l.reduce((n,r)=>n+r.data.paragraphs.length,0)}
+function renderStats(){
+  let days=0,words=0,sentences=0,paragraphs=0;
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k||!/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k))continue;
+    try{
+      const date=k.slice(8),x=normalize(JSON.parse(localStorage.getItem(k)||'{}'),date);
+      const w=x.words.length,s=x.sentences.length,p=x.paragraphs.length;
+      if(w||s||p)days++;
+      words+=w;sentences+=s;paragraphs+=p;
+    }catch(e){console.warn('통계에서 건너뛴 기록',k,e)}
+  }
+  $('#statDays').textContent=days;
+  $('#statWords').textContent=words;
+  $('#statSentences').textContent=sentences;
+  $('#statParagraphs').textContent=paragraphs;
+}
 function renderAll(){render();renderArchive();renderStats()}
 
 function switchView(n,remember=true){
@@ -403,6 +435,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-1');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-3');
 </script>
 </body></html>
