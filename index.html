@@ -418,11 +418,13 @@ function renderStats(){
   $('#statSentences').textContent=l.reduce((n,r)=>n+r.data.sentences.length,0);
   $('#statParagraphs').textContent=l.reduce((n,r)=>n+r.data.paragraphs.length,0);
 }
-function switchView(n){
+function switchView(n, remember=true){
   const ids={write:'writeView',archive:'archiveView',stats:'statsView',settings:'settingsView'};
+  if(!ids[n]) n='write';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   $('#'+ids[n]).classList.add('active');
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===n));
+  if(remember) sessionStorage.setItem('yeobaek:activeView',n);
   if(n==='archive')renderArchive();
   if(n==='stats')renderStats();
   window.scrollTo({top:0,behavior:'auto'});
@@ -443,6 +445,7 @@ function activeViewName(){
 }
 function refreshCurrentView(){
   const current = activeViewName();
+  sessionStorage.setItem('yeobaek:activeView',current);
   if(current === 'write') render();
   if(current === 'archive') renderArchive();
   if(current === 'stats') renderStats();
@@ -536,6 +539,8 @@ document.getElementById("restoreInput")?.addEventListener("change",async e=>{
 });
 
 render(); renderArchive(); renderStats();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=5-4');
+const savedView=sessionStorage.getItem('yeobaek:activeView');
+if(savedView) switchView(savedView,false);
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=5-5');
 
 </script></body></html>
