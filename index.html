@@ -153,24 +153,43 @@ const dateKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+
 const storageKey=d=>'yeobaek:'+dateKey(d);
 const blank=()=>({words:[],sentences:[],paragraphs:[],draftSentence:'',draftParagraph:'',_ids:{words:[],sentences:[],paragraphs:[]},_deleted:[],_draftUpdatedAt:0});
 
-function normalize(x={}){
+function stableLegacyId(date,type,value,occurrence=0){
+  const s=(date||'unknown')+'|'+type+'|'+String(value||'')+'|'+occurrence;
+  let h=2166136261;
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}
+  return 'legacy-'+(h>>>0).toString(36);
+}
+function normalize(x={},date=''){
   const o=Object.assign(blank(),x||{});
   o.words=Array.isArray(o.words)?o.words:[];
   o.sentences=Array.isArray(o.sentences)?o.sentences:[];
   o.paragraphs=Array.isArray(o.paragraphs)?o.paragraphs:[];
   o._ids=o._ids||{words:[],sentences:[],paragraphs:[]};
   for(const type of ['words','sentences','paragraphs']){
-    o._ids[type]=Array.isArray(o._ids[type])?o._ids[type]:[];
-    while(o._ids[type].length<o[type].length) o._ids[type].push(uid());
-    if(o._ids[type].length>o[type].length) o._ids[type]=o._ids[type].slice(0,o[type].length);
+    const ids=Array.isArray(o._ids[type])?o._ids[type]:[];
+    const seenText=new Map(), newVals=[], newIds=[], seenIds=new Set(), seenLegacyContent=new Set();
+    o[type].forEach((value,i)=>{
+      const text=String(value??'');
+      const occurrence=seenText.get(text)||0; seenText.set(text,occurrence+1);
+      let id=ids[i];
+      // v6 may have assigned different random IDs to the same old content on each device.
+      // For duplicate content already present, collapse to one item during repair.
+      const contentKey=text;
+      if(seenLegacyContent.has(contentKey)) return;
+      seenLegacyContent.add(contentKey);
+      if(!id || /^legacy-/.test(id)) id=stableLegacyId(date,type,text,0);
+      if(seenIds.has(id)) return;
+      seenIds.add(id); newVals.push(text); newIds.push(id);
+    });
+    o[type]=newVals; o._ids[type]=newIds;
   }
-  o._deleted=Array.isArray(o._deleted)?o._deleted:[];
+  o._deleted=Array.isArray(o._deleted)?[...new Set(o._deleted)]:[];
   o._draftUpdatedAt=Number(o._draftUpdatedAt)||0;
   return o;
 }
-function loadByDate(d=current){try{return normalize(JSON.parse(localStorage.getItem(storageKey(d))||'{}'))}catch{return blank()}}
+function loadByDate(d=current){try{return normalize(JSON.parse(localStorage.getItem(storageKey(d))||'{}'),dateKey(d))}catch{return blank()}}
 function saveLocal(x,d=current,queue=true){
-  localStorage.setItem(storageKey(d),JSON.stringify(normalize(x)));
+  localStorage.setItem(storageKey(d),JSON.stringify(normalize(x,dateKey(d))));
   if(queue) scheduleCloudUpload();
 }
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
@@ -182,14 +201,14 @@ function collectLocalEntries(){
  for(let i=0;i<localStorage.length;i++){
    const k=localStorage.key(i);
    if(k&&/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k)){
-     try{entries[k.slice(8)]=normalize(JSON.parse(localStorage.getItem(k)))}catch{}
+     try{entries[k.slice(8)]=normalize(JSON.parse(localStorage.getItem(k)),k.slice(8))}catch{}
    }
  }
  return entries;
 }
 function putLocalEntries(entries={}){
  applyingCloud=true;
- for(const [date,data] of Object.entries(entries)) localStorage.setItem('yeobaek:'+date,JSON.stringify(normalize(data)));
+ for(const [date,data] of Object.entries(entries)) localStorage.setItem('yeobaek:'+date,JSON.stringify(normalize(data,date)));
  applyingCloud=false;
 }
 function mergeEntry(a={},b={}){
@@ -197,8 +216,12 @@ function mergeEntry(a={},b={}){
  const deleted=new Set([...(a._deleted||[]),...(b._deleted||[])]);
  const out=blank(); out._deleted=[...deleted];
  for(const type of ['words','sentences','paragraphs']){
-   const map=new Map();
-   const add=(src)=>src[type].forEach((v,i)=>{const id=src._ids[type][i];if(id&&!deleted.has(id)&&!map.has(id))map.set(id,v)});
+   const map=new Map(), contentSeen=new Set();
+   const add=(src)=>src[type].forEach((v,i)=>{
+     const id=src._ids[type][i]; const content=String(v??'');
+     if(!id||deleted.has(id)||map.has(id)||contentSeen.has(content))return;
+     map.set(id,v);contentSeen.add(content);
+   });
    add(b); add(a);
    out._ids[type]=[...map.keys()]; out[type]=[...map.values()];
  }
@@ -288,7 +311,7 @@ function render(){
  const x=loadByDate(),dk=dateKey(current);
  $('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];
  $('#wordCount').textContent='오늘 '+x.words.length+'개';
- $('#recent').innerHTML=x.words.slice(-6).map((w,i)=>{const idx=x.words.length-Math.min(6,x.words.length)+i;return `<span class="chip">${esc(w)} ${deleteButton(dk,'words',idx,false)}</span>`}).join('');
+ $('#recent').innerHTML=x.words.map((w,i)=>`<span class="chip">${esc(w)} ${deleteButton(dk,'words',i,false)}</span>`).join('');
  if(document.activeElement!==$('#sentence')) $('#sentence').value=x.draftSentence||'';
  if(document.activeElement!==$('#paragraph')) $('#paragraph').value=x.draftParagraph||'';
  $('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(dk,'sentences',i,true)}</div>`).join(''):'';
@@ -364,8 +387,22 @@ document.addEventListener('touchstart',e=>{if(window.scrollY>0||e.touches.length
 document.addEventListener('touchmove',e=>{if(!pullTracking||pullStartY===null||window.scrollY>0)return;pullDistance=Math.max(0,e.touches[0].clientY-pullStartY);if(pullDistance<10)return;pullRefresh.classList.add('show');if(pullDistance>=PULL_TRIGGER){pullRefresh.textContent='놓으면 새로고침';pullRefresh.classList.add('ready')}else{pullRefresh.textContent='아래로 당겨 새로고침';pullRefresh.classList.remove('ready')}},{passive:true});
 document.addEventListener('touchend',()=>{if(!pullTracking)return;const yes=pullDistance>=PULL_TRIGGER&&window.scrollY<=0;pullTracking=false;pullStartY=null;pullDistance=0;if(yes)refreshCurrentView();else pullRefresh.classList.remove('show','ready')},{passive:true});
 
+
+function repairExistingLocalData(){
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k)){
+      try{
+        const date=k.slice(8), raw=JSON.parse(localStorage.getItem(k)||'{}');
+        localStorage.setItem(k,JSON.stringify(normalize(raw,date)));
+      }catch{}
+    }
+  }
+}
+repairExistingLocalData();
+
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-1');
 </script>
 </body></html>

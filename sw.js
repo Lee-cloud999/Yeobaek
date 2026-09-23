@@ -1,5 +1,5 @@
-const CACHE='yeobaek-v6-realtime-sync-20260923';
-const APP=['./?v=6','./index.html?v=6','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const CACHE='yeobaek-v6-1-sync-dedupe-20260923';
+const APP=['./?v=6-1','./index.html?v=6-1','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -16,9 +16,9 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=6',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=6-1',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=6'))
+      }).catch(()=>caches.match('./index.html?v=6-1'))
     );
     return;
   }
