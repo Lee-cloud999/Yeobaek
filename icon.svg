@@ -1,4 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="112" fill="#f2e8df"/>
-<text x="256" y="315" text-anchor="middle" font-family="serif" font-size="210" fill="#6f5547">여</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<defs>
+<style>
+@font-face{font-family:"MaruBuri";src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");font-weight:600}
+.word{font-family:"MaruBuri","AppleMyungjo","Batang",serif;font-weight:600}
+</style>
+</defs>
+<rect width="512" height="512" rx="112" fill="#f5eee7"/>
+<rect x="22" y="22" width="468" height="468" rx="94" fill="none" stroke="#d9c9bd" stroke-width="4"/>
+<text x="256" y="282" text-anchor="middle" dominant-baseline="middle" class="word" font-size="116" fill="#654f42" letter-spacing="-8">여백</text>
 </svg>

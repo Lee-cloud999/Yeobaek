@@ -8,31 +8,32 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="여백">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="icon" href="./icon.svg?v=4" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-180.png?v=4">
 <title>여백</title>
 
 <style id="maruburi-font">
 @font-face{
-  font-family:"Maru Buri";
-  src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-Regular.woff2") format("woff2");
+  font-family:"MaruBuri";
+  src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2") format("woff2");
   font-weight:400;font-style:normal;font-display:swap;
 }
 @font-face{
-  font-family:"Maru Buri";
-  src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");
+  font-family:"MaruBuri";
+  src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");
   font-weight:600;font-style:normal;font-display:swap;
 }
 @font-face{
-  font-family:"Maru Buri";
-  src:url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri-Bold.woff2") format("woff2");
+  font-family:"MaruBuri";
+  src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2") format("woff2");
   font-weight:700;font-style:normal;font-display:swap;
 }
 </style>
 
 <style>
 :root{--ink:#59463b;--muted:#8e7b70;--line:#d6c6ba;--brown:#866b59;--chip:#dfd0c5}
-*{box-sizing:border-box}button,input,textarea,select{font-family:"Maru Buri","AppleMyungjo","Noto Serif KR","Batang",serif}html,body{margin:0;min-height:100%;background:#e8e1da}
-body{color:var(--ink);font-family:"Maru Buri","AppleMyungjo","Noto Serif KR","Batang",serif}
+*{box-sizing:border-box}button,input,textarea,select{font-family:"MaruBuri","AppleMyungjo","Noto Serif KR","Batang",serif}html,body{margin:0;min-height:100%;background:#e8e1da}
+body{color:var(--ink);font-family:"MaruBuri","AppleMyungjo","Noto Serif KR","Batang",serif}
 .app{width:min(100%,480px);min-height:100dvh;margin:auto;background:linear-gradient(#fbf7f2,#f5eee7);padding-bottom:68px}
 .top{padding:22px 18px 12px;display:grid;grid-template-columns:minmax(0,1fr) minmax(178px,1.35fr);gap:14px}
 .brand{font-size:34px;line-height:1.05;letter-spacing:-2px;margin:2px 0 8px}.intro{font-size:14px;line-height:1.55;white-space:nowrap}
@@ -71,22 +72,155 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 <section id="settingsView" class="view subview"><div class="pagehead"><h2>설정</h2><p>여백 웹앱</p></div><div class="settingCard"><h3>저장 방식</h3><p>현재 기록은 이 기기의 브라우저에 저장됩니다. Firebase 동기화와 전체 백업·복원은 다음 단계에서 연결합니다.</p></div></section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div>
 <script>
-const $=s=>document.querySelector(s),weekdays=['일','월','화','수','목','금','토'];let current=new Date();
-const quotes=[['쓰는 마음이,','조금은 가벼워지기를.'],['오늘의 생각이,','조용히 머물기를.'],['흘러가는 생각을,','잠시 붙잡아두세요.'],['생각나는 대로,','가볍게 시작해보세요.'],['아직 문장이 아니어도,','괜찮아요.'],['작은 생각 하나도,','남겨둘 만하니까요.'],['한 단어에서,','이야기가 시작될지도 몰라요.'],['마음에 떠오른 것을,','천천히 놓아보세요.']];
-const q=quotes[Math.floor(Math.random()*quotes.length)];$('#quote').innerHTML=q[0]+'<br>'+q[1];
-const dateKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),key=d=>'yeobaek:'+dateKey(d);
-const blank=()=>({words:[],sentences:[],paragraphs:[],draftSentence:'',draftParagraph:''});
-function load(){try{return Object.assign(blank(),JSON.parse(localStorage.getItem(key(current))||'{}'))}catch(e){return blank()}}function save(x){localStorage.setItem(key(current),JSON.stringify(x))}
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),900)}
-function render(){const x=load(),dk=dateKey(current);$('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];$('#wordCount').textContent='오늘 '+x.words.length+'개';$('#recent').innerHTML=x.words.slice(-6).map((w,i)=>{const idx=x.words.length-Math.min(6,x.words.length)+i;return '<span class="chip">'+esc(w)+' <button class="del" onclick="deleteItem(\\''+dk+'\\',\\'words\\','+idx+',false)">×</button></span>'}).join('');$('#sentence').value=x.draftSentence||'';$('#paragraph').value=x.draftParagraph||'';$('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+dk+'\\',\\'sentences\\','+i+',true)">×</button></div>').join(''):'';$('#todayParagraphs').innerHTML=x.paragraphs.length?'<div class="todaySavedLabel">오늘 저장한 문단</div>'+x.paragraphs.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+dk+'\\',\\'paragraphs\\','+i+',true)">×</button></div>').join(''):''}
-function addWord(){const e=$('#word'),v=e.value.trim();if(!v)return;const x=load();x.words.push(v);save(x);e.value='';render();toast('단어를 저장했어요.')}$('#word').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addWord()}});$('#addWord').onclick=addWord;
-$('#sentence').oninput=e=>{const x=load();x.draftSentence=e.target.value;save(x)};$('#paragraph').oninput=e=>{const x=load();x.draftParagraph=e.target.value;save(x)};
-$('#addSentence').onclick=()=>{const x=load(),v=$('#sentence').value.trim();if(!v)return;x.sentences.push(v);x.draftSentence='';save(x);render();toast('문장을 저장했어요.')};$('#addParagraph').onclick=()=>{const x=load(),v=$('#paragraph').value.trim();if(!v)return;x.paragraphs.push(v);x.draftParagraph='';save(x);render();toast('문단을 저장했어요.')};$('#prev').onclick=()=>{current.setDate(current.getDate()-1);render()};$('#next').onclick=()=>{current.setDate(current.getDate()+1);render()};
-function allData(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!k.startsWith('yeobaek:'))continue;try{const x=Object.assign(blank(),JSON.parse(localStorage.getItem(k)||'{}'));if(x.words.length||x.sentences.length||x.paragraphs.length)o.push({date:k.slice(8),data:x})}catch(e){}}return o.sort((a,b)=>b.date.localeCompare(a.date))}
-function prettyDate(s){const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]);return a[0]+'년 '+a[1]+'월 '+a[2]+'일 '+weekdays[d.getDay()]+'요일'}
-function deleteItem(date,type,index,ask=true){if(ask&&!confirm('이 기록을 삭제할까요?'))return;const k='yeobaek:'+date;let x;try{x=Object.assign(blank(),JSON.parse(localStorage.getItem(k)||'{}'))}catch(e){return}if(!x[type]||index<0||index>=x[type].length)return;x[type].splice(index,1);localStorage.setItem(k,JSON.stringify(x));render();renderArchive();renderStats();toast('삭제했어요.')}window.deleteItem=deleteItem;
-function renderArchive(){const list=allData(),b=$('#archiveList');if(!list.length){b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';return}b.innerHTML=list.map(r=>{const d=r.data,date=r.date,w=d.words.length?'<div class="archiveGroup"><div class="archiveLabel">WORD</div>'+d.words.map((v,i)=>'<span class="wordRecord">'+esc(v)+'<button class="del" onclick="deleteItem(\\''+date+'\\',\\'words\\','+i+',false)">×</button></span>').join('')+'</div>':'',s=d.sentences.length?'<div class="archiveGroup"><div class="archiveLabel">SENTENCE</div>'+d.sentences.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+date+'\\',\\'sentences\\','+i+',true)">×</button></div>').join('')+'</div>':'',p=d.paragraphs.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+d.paragraphs.map((v,i)=>'<div class="record"><div class="recordText">'+esc(v)+'</div><button class="del" onclick="deleteItem(\\''+date+'\\',\\'paragraphs\\','+i+',true)">×</button></div>').join('')+'</div>':'';return '<div class="archiveDay"><div class="archiveDate">'+prettyDate(date)+'</div>'+w+s+p+'</div>'}).join('')}
-function renderStats(){const l=allData();$('#statDays').textContent=l.length;$('#statWords').textContent=l.reduce((n,r)=>n+r.data.words.length,0);$('#statSentences').textContent=l.reduce((n,r)=>n+r.data.sentences.length,0);$('#statParagraphs').textContent=l.reduce((n,r)=>n+r.data.paragraphs.length,0)}
-function switchView(n){const ids={write:'writeView',archive:'archiveView',stats:'statsView',settings:'settingsView'};document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('#'+ids[n]).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===n));if(n==='archive')renderArchive();if(n==='stats')renderStats();window.scrollTo(0,0)}document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchView(t.dataset.view));
-render();renderArchive();renderStats();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js');
+
+const $ = (s) => document.querySelector(s);
+const weekdays = ['일','월','화','수','목','금','토'];
+let current = new Date();
+
+const quotes = [
+  ['쓰는 마음이,','조금은 가벼워지기를.'],
+  ['오늘의 생각이,','조용히 머물기를.'],
+  ['흘러가는 생각을,','잠시 붙잡아두세요.'],
+  ['생각나는 대로,','가볍게 시작해보세요.'],
+  ['아직 문장이 아니어도,','괜찮아요.'],
+  ['작은 생각 하나도,','남겨둘 만하니까요.'],
+  ['한 단어에서,','이야기가 시작될지도 몰라요.'],
+  ['마음에 떠오른 것을,','천천히 놓아보세요.']
+];
+const q = quotes[Math.floor(Math.random()*quotes.length)];
+$('#quote').innerHTML = q[0] + '<br>' + q[1];
+
+const dateKey = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const storageKey = d => 'yeobaek:' + dateKey(d);
+const blank = () => ({words:[],sentences:[],paragraphs:[],draftSentence:'',draftParagraph:''});
+
+function loadByDate(d=current){
+  try { return Object.assign(blank(), JSON.parse(localStorage.getItem(storageKey(d)) || '{}')); }
+  catch(e){ return blank(); }
+}
+function save(x){ localStorage.setItem(storageKey(current), JSON.stringify(x)); }
+function esc(s){
+  const d=document.createElement('div'); d.textContent=s; return d.innerHTML;
+}
+function toast(t){
+  const e=$('#toast'); e.textContent=t; e.classList.add('show');
+  setTimeout(()=>e.classList.remove('show'),900);
+}
+function deleteButton(date,type,index,ask){
+  return `<button class="del delete-record" data-date="${date}" data-type="${type}" data-index="${index}" data-ask="${ask ? '1':'0'}" aria-label="삭제">×</button>`;
+}
+function render(){
+  const x=loadByDate(), dk=dateKey(current);
+  $('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];
+  $('#wordCount').textContent='오늘 '+x.words.length+'개';
+
+  $('#recent').innerHTML=x.words.slice(-6).map((w,i)=>{
+    const idx=x.words.length-Math.min(6,x.words.length)+i;
+    return `<span class="chip">${esc(w)} ${deleteButton(dk,'words',idx,false)}</span>`;
+  }).join('');
+
+  $('#sentence').value=x.draftSentence||'';
+  $('#paragraph').value=x.draftParagraph||'';
+
+  $('#todaySentences').innerHTML=x.sentences.length
+    ? '<div class="todaySavedLabel">오늘 저장한 문장</div>'+
+      x.sentences.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(dk,'sentences',i,true)}</div>`).join('')
+    : '';
+
+  $('#todayParagraphs').innerHTML=x.paragraphs.length
+    ? '<div class="todaySavedLabel">오늘 저장한 문단</div>'+
+      x.paragraphs.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(dk,'paragraphs',i,true)}</div>`).join('')
+    : '';
+}
+function addWord(){
+  const e=$('#word'), v=e.value.trim(); if(!v) return;
+  const x=loadByDate(); x.words.push(v); save(x); e.value=''; render(); toast('단어를 저장했어요.');
+}
+$('#word').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addWord(); }});
+$('#addWord').addEventListener('click',addWord);
+
+$('#sentence').addEventListener('input',e=>{ const x=loadByDate(); x.draftSentence=e.target.value; save(x); });
+$('#paragraph').addEventListener('input',e=>{ const x=loadByDate(); x.draftParagraph=e.target.value; save(x); });
+
+$('#addSentence').addEventListener('click',()=>{
+  const x=loadByDate(),v=$('#sentence').value.trim(); if(!v)return;
+  x.sentences.push(v); x.draftSentence=''; save(x); render(); toast('문장을 저장했어요.');
+});
+$('#addParagraph').addEventListener('click',()=>{
+  const x=loadByDate(),v=$('#paragraph').value.trim(); if(!v)return;
+  x.paragraphs.push(v); x.draftParagraph=''; save(x); render(); toast('문단을 저장했어요.');
+});
+$('#prev').addEventListener('click',()=>{ current.setDate(current.getDate()-1); render(); });
+$('#next').addEventListener('click',()=>{ current.setDate(current.getDate()+1); render(); });
+
+function allData(){
+  const o=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k || !k.startsWith('yeobaek:')) continue;
+    try{
+      const x=Object.assign(blank(),JSON.parse(localStorage.getItem(k)||'{}'));
+      if(x.words.length||x.sentences.length||x.paragraphs.length) o.push({date:k.slice(8),data:x});
+    }catch(e){}
+  }
+  return o.sort((a,b)=>b.date.localeCompare(a.date));
+}
+function prettyDate(s){
+  const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]);
+  return a[0]+'년 '+a[1]+'월 '+a[2]+'일 '+weekdays[d.getDay()]+'요일';
+}
+function deleteItem(date,type,index,ask=true){
+  if(ask && !confirm('이 기록을 삭제할까요?')) return;
+  const k='yeobaek:'+date;
+  let x;
+  try{x=Object.assign(blank(),JSON.parse(localStorage.getItem(k)||'{}'));}catch(e){return;}
+  if(!x[type] || index<0 || index>=x[type].length) return;
+  x[type].splice(index,1);
+  localStorage.setItem(k,JSON.stringify(x));
+  render(); renderArchive(); renderStats(); toast('삭제했어요.');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.delete-record');
+  if(!b)return;
+  deleteItem(b.dataset.date,b.dataset.type,Number(b.dataset.index),b.dataset.ask==='1');
+});
+
+function renderArchive(){
+  const list=allData(),b=$('#archiveList');
+  if(!list.length){
+    b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';
+    return;
+  }
+  b.innerHTML=list.map(r=>{
+    const d=r.data,date=r.date;
+    const w=d.words.length?'<div class="archiveGroup"><div class="archiveLabel">WORD</div>'+
+      d.words.map((v,i)=>`<span class="wordRecord">${esc(v)}${deleteButton(date,'words',i,false)}</span>`).join('')+'</div>':'';
+    const s=d.sentences.length?'<div class="archiveGroup"><div class="archiveLabel">SENTENCE</div>'+
+      d.sentences.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(date,'sentences',i,true)}</div>`).join('')+'</div>':'';
+    const p=d.paragraphs.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+
+      d.paragraphs.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(date,'paragraphs',i,true)}</div>`).join('')+'</div>':'';
+    return `<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`;
+  }).join('');
+}
+function renderStats(){
+  const l=allData();
+  $('#statDays').textContent=l.length;
+  $('#statWords').textContent=l.reduce((n,r)=>n+r.data.words.length,0);
+  $('#statSentences').textContent=l.reduce((n,r)=>n+r.data.sentences.length,0);
+  $('#statParagraphs').textContent=l.reduce((n,r)=>n+r.data.paragraphs.length,0);
+}
+function switchView(n){
+  const ids={write:'writeView',archive:'archiveView',stats:'statsView',settings:'settingsView'};
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $('#'+ids[n]).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===n));
+  if(n==='archive')renderArchive();
+  if(n==='stats')renderStats();
+  window.scrollTo({top:0,behavior:'auto'});
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
+
+render(); renderArchive(); renderStats();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=4');
+
 </script></body></html>

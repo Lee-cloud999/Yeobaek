@@ -1,5 +1,5 @@
-const CACHE='yeobaek-v3-maruburi-full';
-const APP=['./','./index.html','./manifest.webmanifest','./icon.svg'];
+const CACHE='yeobaek-v4-fixed-20260923';
+const APP=['./?v=4','./index.html?v=4','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -14,13 +14,20 @@ self.addEventListener('activate',event=>{
 self.addEventListener('fetch',event=>{
   if(event.request.mode==='navigate'){
     event.respondWith(
-      fetch(event.request).then(res=>{
+      fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=4',copy));
         return res;
-      }).catch(()=>caches.match('./index.html'))
+      }).catch(()=>caches.match('./index.html?v=4'))
     );
     return;
   }
-  event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request)));
+  event.respondWith(
+    fetch(event.request).then(res=>{
+      if(event.request.url.startsWith(self.location.origin)){
+        const copy=res.clone(); caches.open(CACHE).then(c=>c.put(event.request,copy));
+      }
+      return res;
+    }).catch(()=>caches.match(event.request))
+  );
 });
