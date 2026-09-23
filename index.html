@@ -64,11 +64,14 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 <style id="sync-backup-style">
 .settingsCard{background:rgba(235,225,216,.72);border-radius:20px;padding:6px 18px;margin:14px 0}
 .settingRow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 0;border-bottom:1px solid rgba(113,88,70,.13)}
-.settingRow:last-child{border-bottom:0}.settingRow b{display:block;font-size:16px;font-weight:600}.settingRow small{display:block;margin-top:5px;color:#8b7a6e;line-height:1.45}
+.settingRow:last-child{border-bottom:0}.settingRow b{display:block;font-size:16px;font-weight:600}
+.settingRow small{display:block;margin-top:5px;color:#8b7a6e;line-height:1.45}
+.loginBox{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:15px 0;border-bottom:1px solid rgba(113,88,70,.13)}
+.loginBox[hidden]{display:none}.loginBox input{min-width:0;border:1px solid #d8c9bd;background:#fffaf6;border-radius:13px;padding:11px 12px;font:inherit;color:#5f5047}
 .softBtn{appearance:none;border:1px solid #cdbbad;background:#fbf7f2;color:#695548;border-radius:999px;padding:10px 14px;font-family:"MaruBuri","AppleMyungjo","Batang",serif;font-size:13px;white-space:nowrap;cursor:pointer}
-.softBtn:disabled{opacity:.45}.settingsNote{font-size:12px;line-height:1.7;color:#8c7b70;margin:14px 4px}.fileBtn{display:inline-block}
+.primaryBtn{background:#e8ddd3}.softBtn:disabled{opacity:.45}.settingsNote{font-size:12px;line-height:1.7;color:#8c7b70;margin:14px 4px}.fileBtn{display:inline-block}
 #syncStatus[data-kind="ok"]{color:#65745e}#syncStatus[data-kind="error"]{color:#a05d58}
-@media(max-width:600px){.settingRow{align-items:flex-start;flex-direction:column}.settingRow>div:last-child{width:100%}.softBtn{max-width:100%}}
+@media(max-width:700px){.settingRow{align-items:flex-start;flex-direction:column}.loginBox{grid-template-columns:1fr}.softBtn{max-width:100%}}
 </style>
 
 </head>
@@ -81,138 +84,148 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 <section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div id="archiveList"></div></section>
 <section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
 <section id="settingsView" class="view subview">
-<div class="subHeader"><h2>설정</h2><p>기록을 안전하게 보관하고 여러 기기에서 이어서 써보세요.</p></div>
+<div class="subHeader"><h2>설정</h2><p>기존 앱과 같은 이메일 계정으로 기록을 이어서 보관하세요.</p></div>
+
 <div class="settingsCard">
-  <div class="settingRow"><div><b>계정</b><small id="accountStatus">확인 중…</small></div>
-    <div><button class="softBtn" id="googleLoginBtn">Google로 로그인</button><button class="softBtn" id="logoutBtn" hidden>로그아웃</button></div>
+  <div class="settingRow">
+    <div><b>계정</b><small id="accountStatus">확인 중…</small></div>
+    <button class="softBtn" id="logoutBtn" hidden>로그아웃</button>
   </div>
-  <div class="settingRow"><div><b>동기화</b><small id="syncStatus">상태 확인 중…</small></div>
+  <div id="loginBox" class="loginBox">
+    <input id="loginEmail" type="email" autocomplete="username" placeholder="이메일">
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="비밀번호">
+    <button class="softBtn primaryBtn" id="emailLoginBtn">로그인</button>
+  </div>
+  <div class="settingRow">
+    <div><b>동기화</b><small id="syncStatus">상태 확인 중…</small></div>
     <button class="softBtn" id="syncNowBtn" disabled>지금 동기화</button>
   </div>
 </div>
+
 <div class="settingsCard">
-  <div class="settingRow"><div><b>전체 백업</b><small>모든 여백 기록을 JSON 파일로 저장합니다.</small></div>
+  <div class="settingRow">
+    <div><b>전체 백업</b><small>모든 《여백》 기록을 JSON 파일로 저장합니다.</small></div>
     <button class="softBtn" id="backupBtn">백업 파일 만들기</button>
   </div>
-  <div class="settingRow"><div><b>백업 복원</b><small>여백 백업 파일을 현재 기록과 합칩니다.</small></div>
+  <div class="settingRow">
+    <div><b>백업 복원</b><small>백업 기록을 현재 기록과 합칩니다.</small></div>
     <label class="softBtn fileBtn">백업 파일 선택<input id="restoreInput" type="file" accept="application/json,.json" hidden></label>
   </div>
 </div>
-<div class="settingsNote">로그인하지 않아도 기록은 이 기기에 계속 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
+<div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA7bmUOzfXHi5tEv6p9df1QrbQ0TmIJBoE",
-  authDomain: "yeobaek-fef0b.firebaseapp.com",
-  projectId: "yeobaek-fef0b",
-  storageBucket: "yeobaek-fef0b.firebasestorage.app",
-  messagingSenderId: "5901103834",
-  appId: "1:5901103834:web:92554e179de382a8f36be3"
+  apiKey: "AIzaSyC0y8x5kPeJUUqRUjEHRqckT2ReULEoUac",
+  authDomain: "maeum-jogak2.firebaseapp.com",
+  projectId: "maeum-jogak2",
+  storageBucket: "maeum-jogak2.firebasestorage.app",
+  messagingSenderId: "942972843404",
+  appId: "1:942972843404:web:d209eebd2e1f647d09d2a9",
+  measurementId: "G-BQH27N81B7"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
 
-const status = (text, kind="") => {
+function setSyncStatus(text, kind="") {
   const el = document.getElementById("syncStatus");
   if (el) { el.textContent = text; el.dataset.kind = kind; }
-};
-const account = (user) => {
+}
+function setAccount(user) {
   const el = document.getElementById("accountStatus");
-  if (!el) return;
-  el.textContent = user ? (user.displayName || user.email || "Google 계정") : "로그인하지 않음";
-};
-const collectLocal = () => {
+  if (el) el.textContent = user ? (user.email || "로그인됨") : "로그인하지 않음";
+}
+function collectLocalEntries() {
   const entries = {};
   for (let i=0; i<localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (!k || !k.startsWith("yeobaek:")) continue;
+    if (!k || !/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k)) continue;
     try { entries[k.slice(8)] = JSON.parse(localStorage.getItem(k)); } catch(e) {}
   }
   return entries;
-};
-const putLocal = (entries={}) => {
-  Object.entries(entries).forEach(([date, data]) => {
+}
+function putLocalEntries(entries={}) {
+  for (const [date,data] of Object.entries(entries)) {
     localStorage.setItem("yeobaek:"+date, JSON.stringify(data));
-  });
-};
-const mergeEntry = (a={}, b={}) => {
-  const uniq = arr => [...new Set((arr||[]).filter(v => typeof v === "string"))];
+  }
+}
+function mergeEntry(local={}, cloud={}) {
+  // 기존 기록을 잃지 않도록 문자열 기준으로 합칩니다.
+  const uniq = xs => [...new Set((xs||[]).filter(x => typeof x === "string"))];
   return {
-    words: uniq([...(a.words||[]), ...(b.words||[])]),
-    sentences: uniq([...(a.sentences||[]), ...(b.sentences||[])]),
-    paragraphs: uniq([...(a.paragraphs||[]), ...(b.paragraphs||[])]),
-    draftSentence: a.draftSentence || b.draftSentence || "",
-    draftParagraph: a.draftParagraph || b.draftParagraph || ""
+    words: uniq([...(local.words||[]), ...(cloud.words||[])]),
+    sentences: uniq([...(local.sentences||[]), ...(cloud.sentences||[])]),
+    paragraphs: uniq([...(local.paragraphs||[]), ...(cloud.paragraphs||[])]),
+    draftSentence: local.draftSentence || cloud.draftSentence || "",
+    draftParagraph: local.draftParagraph || cloud.draftParagraph || ""
   };
-};
-const mergeAll = (local={}, cloud={}) => {
-  const merged = {};
-  new Set([...Object.keys(cloud), ...Object.keys(local)]).forEach(d => {
-    merged[d] = mergeEntry(local[d]||{}, cloud[d]||{});
-  });
-  return merged;
-};
+}
+function mergeAll(local={}, cloud={}) {
+  const out = {};
+  for (const d of new Set([...Object.keys(cloud), ...Object.keys(local)])) {
+    out[d] = mergeEntry(local[d]||{}, cloud[d]||{});
+  }
+  return out;
+}
 async function syncNow(silent=false) {
   const user = auth.currentUser;
-  if (!user) { if(!silent) alert("먼저 Google 계정으로 로그인해주세요."); return; }
+  if (!user) { if(!silent) alert("먼저 이메일로 로그인해주세요."); return; }
   try {
-    status("동기화 중…");
-    const ref = doc(db, "users", user.uid, "appData", "yeobaek");
+    setSyncStatus("동기화 중…");
+    // 기존 앱 데이터와 섞이지 않도록 여백 전용 문서에만 저장
+    const ref = doc(db, "users", user.uid, "apps", "yeobaek");
     const snap = await getDoc(ref);
     const cloud = snap.exists() ? (snap.data().entries || {}) : {};
-    const local = collectLocal();
-    const merged = mergeAll(local, cloud);
-    putLocal(merged);
-    await setDoc(ref, { entries: merged, updatedAt: serverTimestamp(), version: 1 }, { merge: true });
+    const merged = mergeAll(collectLocalEntries(), cloud);
+    putLocalEntries(merged);
+    await setDoc(ref, {
+      app: "yeobaek",
+      version: 1,
+      entries: merged,
+      updatedAt: serverTimestamp()
+    }, {merge:true});
     localStorage.setItem("yeobaek:lastSync", new Date().toISOString());
-    status("동기화 완료", "ok");
-    if (window.render) { window.render(); window.renderArchive?.(); window.renderStats?.(); }
+    setSyncStatus("동기화 완료", "ok");
+    window.render?.(); window.renderArchive?.(); window.renderStats?.();
   } catch (e) {
-    console.error(e); status("동기화 실패", "error");
-    if(!silent) alert("동기화하지 못했어요. 인터넷 연결과 Firebase 설정을 확인해주세요.");
+    console.error(e);
+    setSyncStatus("동기화 실패", "error");
+    if(!silent) alert("동기화하지 못했어요. Firestore 규칙 또는 인터넷 연결을 확인해주세요.");
   }
 }
-async function login() {
+async function login(email, password) {
+  if (!email || !password) { alert("이메일과 비밀번호를 입력해주세요."); return; }
   try {
-    status("로그인 중…");
-    // iPad/Safari/PWA: redirect is more reliable; normal desktop browsers can use popup.
-    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    if (isiOS) await signInWithRedirect(auth, provider);
-    else await signInWithPopup(auth, provider);
+    setSyncStatus("로그인 중…");
+    await signInWithEmailAndPassword(auth, email.trim(), password);
   } catch(e) {
-    console.error(e); status("로그인 실패","error");
-    alert("Google 로그인에 실패했어요.");
+    console.error(e);
+    setSyncStatus("로그인 실패", "error");
+    alert("로그인하지 못했어요. 이메일과 비밀번호를 확인해주세요.");
   }
 }
-window.yeobaekCloud = {
-  login,
-  logout: () => signOut(auth),
-  syncNow
-};
-
-try { await getRedirectResult(auth); } catch(e) { console.error(e); }
+window.yeobaekCloud = { login, logout:()=>signOut(auth), syncNow };
 
 onAuthStateChanged(auth, async user => {
-  account(user);
-  const loginBtn=document.getElementById("googleLoginBtn");
-  const logoutBtn=document.getElementById("logoutBtn");
-  const syncBtn=document.getElementById("syncNowBtn");
-  if(loginBtn) loginBtn.hidden=!!user;
-  if(logoutBtn) logoutBtn.hidden=!user;
-  if(syncBtn) syncBtn.disabled=!user;
+  setAccount(user);
+  document.getElementById("loginBox")?.toggleAttribute("hidden", !!user);
+  document.getElementById("logoutBtn")?.toggleAttribute("hidden", !user);
+  const syncBtn = document.getElementById("syncNowBtn");
+  if(syncBtn) syncBtn.disabled = !user;
   if(user) {
-    status("로그인됨 · 동기화 준비");
+    setSyncStatus("로그인됨 · 동기화 준비");
     await syncNow(true);
-  } else status("이 기기에만 저장 중");
+  } else {
+    setSyncStatus("이 기기에만 저장 중");
+  }
 });
 </script>
 
@@ -327,46 +340,48 @@ function collectBackupData(){
   const entries={};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k && k.startsWith('yeobaek:')){
-      try{ entries[k.slice(8)]=JSON.parse(localStorage.getItem(k)); }catch(e){}
+    if(k && /^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k)){
+      try{entries[k.slice(8)]=JSON.parse(localStorage.getItem(k));}catch(e){}
     }
   }
-  return {app:'여백',format:'yeobaek-backup',version:1,exportedAt:new Date().toISOString(),entries};
+  return {app:"여백",format:"yeobaek-backup",version:1,exportedAt:new Date().toISOString(),entries};
 }
 function mergeBackupEntry(a={},b={}){
-  const uniq=arr=>[...new Set((arr||[]).filter(v=>typeof v==='string'))];
-  return {
-    words:uniq([...(a.words||[]),...(b.words||[])]),
+  const uniq=xs=>[...new Set((xs||[]).filter(x=>typeof x==="string"))];
+  return {words:uniq([...(a.words||[]),...(b.words||[])]),
     sentences:uniq([...(a.sentences||[]),...(b.sentences||[])]),
     paragraphs:uniq([...(a.paragraphs||[]),...(b.paragraphs||[])]),
-    draftSentence:a.draftSentence||b.draftSentence||'',
-    draftParagraph:a.draftParagraph||b.draftParagraph||''
-  };
+    draftSentence:a.draftSentence||b.draftSentence||"",
+    draftParagraph:a.draftParagraph||b.draftParagraph||""};
 }
-document.getElementById('googleLoginBtn')?.addEventListener('click',()=>window.yeobaekCloud?.login());
-document.getElementById('logoutBtn')?.addEventListener('click',()=>window.yeobaekCloud?.logout());
-document.getElementById('syncNowBtn')?.addEventListener('click',()=>window.yeobaekCloud?.syncNow());
-document.getElementById('backupBtn')?.addEventListener('click',()=>{
-  const data=collectBackupData();
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  toast('전체 백업 파일을 만들었어요.');
+document.getElementById("emailLoginBtn")?.addEventListener("click",()=>{
+  window.yeobaekCloud?.login(document.getElementById("loginEmail").value,document.getElementById("loginPassword").value);
 });
-document.getElementById('restoreInput')?.addEventListener('change',async e=>{
+document.getElementById("loginPassword")?.addEventListener("keydown",e=>{
+  if(e.key==="Enter") document.getElementById("emailLoginBtn")?.click();
+});
+document.getElementById("logoutBtn")?.addEventListener("click",()=>window.yeobaekCloud?.logout());
+document.getElementById("syncNowBtn")?.addEventListener("click",()=>window.yeobaekCloud?.syncNow());
+document.getElementById("backupBtn")?.addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="yeobaek-backup-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast("전체 백업 파일을 만들었어요.");
+});
+document.getElementById("restoreInput")?.addEventListener("change",async e=>{
   const file=e.target.files?.[0]; if(!file)return;
   try{
     const backup=JSON.parse(await file.text());
-    if(backup.format!=='yeobaek-backup'||!backup.entries) throw new Error('invalid');
-    Object.entries(backup.entries).forEach(([date,incoming])=>{
-      let currentData={};try{currentData=JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}')}catch(_){}
-      localStorage.setItem('yeobaek:'+date,JSON.stringify(mergeBackupEntry(currentData,incoming)));
-    });
-    render();renderArchive();renderStats();toast('백업을 복원했어요.');
-    if(window.yeobaekCloud) window.yeobaekCloud.syncNow(true);
-  }catch(err){alert('《여백》 백업 파일을 읽지 못했어요.');}
-  e.target.value='';
+    if(backup.format!=="yeobaek-backup"||!backup.entries) throw new Error("invalid");
+    for(const [date,incoming] of Object.entries(backup.entries)){
+      let current={};try{current=JSON.parse(localStorage.getItem("yeobaek:"+date)||"{}")}catch(_){}
+      localStorage.setItem("yeobaek:"+date,JSON.stringify(mergeBackupEntry(current,incoming)));
+    }
+    render();renderArchive();renderStats();toast("백업을 복원했어요.");
+    window.yeobaekCloud?.syncNow(true);
+  }catch(err){alert("《여백》 백업 파일을 읽지 못했어요.");}
+  e.target.value="";
 });
 
 render(); renderArchive(); renderStats(); toast('삭제했어요.');
@@ -417,46 +432,48 @@ function collectBackupData(){
   const entries={};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
-    if(k && k.startsWith('yeobaek:')){
-      try{ entries[k.slice(8)]=JSON.parse(localStorage.getItem(k)); }catch(e){}
+    if(k && /^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k)){
+      try{entries[k.slice(8)]=JSON.parse(localStorage.getItem(k));}catch(e){}
     }
   }
-  return {app:'여백',format:'yeobaek-backup',version:1,exportedAt:new Date().toISOString(),entries};
+  return {app:"여백",format:"yeobaek-backup",version:1,exportedAt:new Date().toISOString(),entries};
 }
 function mergeBackupEntry(a={},b={}){
-  const uniq=arr=>[...new Set((arr||[]).filter(v=>typeof v==='string'))];
-  return {
-    words:uniq([...(a.words||[]),...(b.words||[])]),
+  const uniq=xs=>[...new Set((xs||[]).filter(x=>typeof x==="string"))];
+  return {words:uniq([...(a.words||[]),...(b.words||[])]),
     sentences:uniq([...(a.sentences||[]),...(b.sentences||[])]),
     paragraphs:uniq([...(a.paragraphs||[]),...(b.paragraphs||[])]),
-    draftSentence:a.draftSentence||b.draftSentence||'',
-    draftParagraph:a.draftParagraph||b.draftParagraph||''
-  };
+    draftSentence:a.draftSentence||b.draftSentence||"",
+    draftParagraph:a.draftParagraph||b.draftParagraph||""};
 }
-document.getElementById('googleLoginBtn')?.addEventListener('click',()=>window.yeobaekCloud?.login());
-document.getElementById('logoutBtn')?.addEventListener('click',()=>window.yeobaekCloud?.logout());
-document.getElementById('syncNowBtn')?.addEventListener('click',()=>window.yeobaekCloud?.syncNow());
-document.getElementById('backupBtn')?.addEventListener('click',()=>{
-  const data=collectBackupData();
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  toast('전체 백업 파일을 만들었어요.');
+document.getElementById("emailLoginBtn")?.addEventListener("click",()=>{
+  window.yeobaekCloud?.login(document.getElementById("loginEmail").value,document.getElementById("loginPassword").value);
 });
-document.getElementById('restoreInput')?.addEventListener('change',async e=>{
+document.getElementById("loginPassword")?.addEventListener("keydown",e=>{
+  if(e.key==="Enter") document.getElementById("emailLoginBtn")?.click();
+});
+document.getElementById("logoutBtn")?.addEventListener("click",()=>window.yeobaekCloud?.logout());
+document.getElementById("syncNowBtn")?.addEventListener("click",()=>window.yeobaekCloud?.syncNow());
+document.getElementById("backupBtn")?.addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="yeobaek-backup-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast("전체 백업 파일을 만들었어요.");
+});
+document.getElementById("restoreInput")?.addEventListener("change",async e=>{
   const file=e.target.files?.[0]; if(!file)return;
   try{
     const backup=JSON.parse(await file.text());
-    if(backup.format!=='yeobaek-backup'||!backup.entries) throw new Error('invalid');
-    Object.entries(backup.entries).forEach(([date,incoming])=>{
-      let currentData={};try{currentData=JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}')}catch(_){}
-      localStorage.setItem('yeobaek:'+date,JSON.stringify(mergeBackupEntry(currentData,incoming)));
-    });
-    render();renderArchive();renderStats();toast('백업을 복원했어요.');
-    if(window.yeobaekCloud) window.yeobaekCloud.syncNow(true);
-  }catch(err){alert('《여백》 백업 파일을 읽지 못했어요.');}
-  e.target.value='';
+    if(backup.format!=="yeobaek-backup"||!backup.entries) throw new Error("invalid");
+    for(const [date,incoming] of Object.entries(backup.entries)){
+      let current={};try{current=JSON.parse(localStorage.getItem("yeobaek:"+date)||"{}")}catch(_){}
+      localStorage.setItem("yeobaek:"+date,JSON.stringify(mergeBackupEntry(current,incoming)));
+    }
+    render();renderArchive();renderStats();toast("백업을 복원했어요.");
+    window.yeobaekCloud?.syncNow(true);
+  }catch(err){alert("《여백》 백업 파일을 읽지 못했어요.");}
+  e.target.value="";
 });
 
 render(); renderArchive(); renderStats();
