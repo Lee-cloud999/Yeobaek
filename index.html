@@ -61,7 +61,7 @@ body{color:var(--ink);font-family:"MaruBuri","AppleMyungjo","Noto Serif KR","Bat
 .date{height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;white-space:nowrap}
 .quote{border-top:1px solid #cbb8aa;margin-top:4px;padding-top:8px;min-height:44px;font-size:12.5px;line-height:1.45}
 main{padding:0 12px}.card{border-radius:17px;padding:13px 14px;margin-bottom:9px;background:rgba(232,220,211,.83)}
-.card:nth-child(2){background:rgba(247,241,236,.9)}.card:nth-child(3){background:rgba(232,220,211,.7)}
+.card:nth-child(2){background:rgba(240,223,205,.95);box-shadow:inset 0 0 0 1px rgba(205,178,152,.55)}.card:nth-child(3){background:rgba(232,220,211,.7)}
 .titleline{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}.kicker{font:bold 9px/1.2 Arial;letter-spacing:1.7px;color:#9a7764}
 .nameRow{display:flex;align-items:baseline;gap:8px;margin-top:0}h2{font-size:21px;line-height:1.15;font-weight:500;letter-spacing:-.7px;margin:0}.count{font-size:11px;color:#87746a}
 .help{font-size:11.5px;line-height:1.35;margin:4px 0 8px}.plus{width:36px;height:36px;border:0;border-radius:50%;background:var(--brown);color:#fff;font:24px/36px Arial;padding:0}
@@ -599,6 +599,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-1');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-2');
 </script>
 </body></html>
