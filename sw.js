@@ -1,5 +1,5 @@
-const CACHE='yeobaek-v7-0-firebase-20261005';
-const APP=['./?v=7-0','./index.html?v=7-0','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const CACHE='yeobaek-v7-1-cards-20261005';
+const APP=['./?v=7-1','./index.html?v=7-1','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -27,9 +27,9 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=7-0',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=7-1',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=7-0'))
+      }).catch(()=>caches.match('./index.html?v=7-1'))
     );
     return;
   }
