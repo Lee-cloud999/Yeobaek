@@ -82,12 +82,19 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 .settingRow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 0;border-bottom:1px solid rgba(113,88,70,.13)}
 .settingRow:last-child{border-bottom:0}.settingRow b{display:block;font-size:16px;font-weight:600}
 .settingRow small{display:block;margin-top:5px;color:#8b7a6e;line-height:1.45}
-.loginBox{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;padding:15px 0;border-bottom:1px solid rgba(113,88,70,.13)}
+.loginBox{display:grid;grid-template-columns:1fr;gap:8px;padding:15px 0;border-bottom:1px solid rgba(113,88,70,.13)}
 .loginBox[hidden]{display:none}.loginBox input{min-width:0;border:1px solid #d8c9bd;background:#fffaf6;border-radius:13px;padding:11px 12px;font:inherit;color:#5f5047}
 .softBtn{appearance:none;border:1px solid #cdbbad;background:#fbf7f2;color:#695548;border-radius:999px;padding:10px 14px;font-family:"MaruBuri","AppleMyungjo","Batang",serif;font-size:13px;white-space:nowrap;cursor:pointer}
 .primaryBtn{background:#e8ddd3}.softBtn:disabled{opacity:.45}.settingsNote{font-size:12px;line-height:1.7;color:#8c7b70;margin:14px 4px}.fileBtn{display:inline-block}
 #syncStatus[data-kind="ok"]{color:#65745e}#syncStatus[data-kind="error"]{color:#a05d58}
 @media(max-width:700px){.settingRow{align-items:flex-start;flex-direction:column}.loginBox{grid-template-columns:1fr}.softBtn{max-width:100%}}
+.loginLinks{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.linkBtn{border:0;background:none;color:#8b7a6e;text-decoration:underline;font-family:inherit;font-size:12.5px;padding:4px 2px;cursor:pointer}
+.deleteBox{display:grid;gap:10px;padding:2px 0 16px}.deleteBox[hidden]{display:none}
+.deleteBox input[type=password]{min-width:0;border:1px solid #d8c9bd;background:#fffaf6;border-radius:13px;padding:11px 12px;font:inherit;color:#5f5047}
+.checkRow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8b7a6e}.checkRow input{width:18px;height:18px;padding:0;margin:0}
+.deleteBtns{display:flex;gap:8px;justify-content:flex-end}
+.dangerBtn{color:#a05d58;border-color:#d9b8b3}
 </style>
 
 </head>
@@ -100,7 +107,7 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 <section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div id="archiveList"></div></section>
 <section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
 <section id="settingsView" class="view subview">
-<div class="subHeader"><h2>설정</h2><p>기존 앱과 같은 이메일 계정으로 기록을 이어서 보관하세요.</p></div>
+<div class="subHeader"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관하세요.</p></div>
 
 <div class="settingsCard">
   <div class="settingRow">
@@ -110,7 +117,9 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
   <div id="loginBox" class="loginBox">
     <input id="loginEmail" type="email" autocomplete="username" placeholder="이메일">
     <input id="loginPassword" type="password" autocomplete="current-password" placeholder="비밀번호">
+    <input id="signupConfirm" type="password" autocomplete="new-password" placeholder="비밀번호 확인" hidden>
     <button class="softBtn primaryBtn" id="emailLoginBtn">로그인</button>
+    <div class="loginLinks"><button class="linkBtn" id="modeToggleBtn" type="button">회원가입</button><button class="linkBtn" id="forgotBtn" type="button">비밀번호 찾기</button></div>
   </div>
   <div class="settingRow">
     <div><b>동기화</b><small id="syncStatus">상태 확인 중…</small></div>
@@ -128,14 +137,25 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
     <label class="softBtn fileBtn">백업 파일 선택<input id="restoreInput" type="file" accept="application/json,.json" hidden></label>
   </div>
 </div>
+<div class="settingsCard" id="deleteCard" hidden>
+  <div class="settingRow">
+    <div><b>계정 삭제</b><small>계정과 클라우드에 저장된 모든 기록을 삭제합니다. 되돌릴 수 없어요.</small></div>
+    <button class="softBtn dangerBtn" id="deleteOpenBtn">계정 삭제</button>
+  </div>
+  <div class="deleteBox" id="deleteBox" hidden>
+    <input id="deletePassword" type="password" autocomplete="current-password" placeholder="비밀번호를 다시 입력해주세요">
+    <label class="checkRow"><input id="deleteLocalToo" type="checkbox"> 이 기기에 저장된 기록도 함께 삭제</label>
+    <div class="deleteBtns"><button class="softBtn" id="deleteCancelBtn" type="button">취소</button><button class="softBtn dangerBtn" id="deleteConfirmBtn" type="button">영구 삭제</button></div>
+  </div>
+</div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, doc, collection, getDoc, getDocs, setDoc, writeBatch, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider, deleteUser, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCOy8x5kPeJUUqRUjEHRqckT2ReULEoUac",
@@ -268,7 +288,7 @@ function isEmptyEntry(e){
 }
 
 async function uploadDays(dates,silent=true){
- if(!auth.currentUser||!daysCol||applyingCloud||!dates.length)return true;
+ if(!auth.currentUser||!daysCol||applyingCloud||deletingAccount||!dates.length)return true;
  setSyncStatus(navigator.onLine?'동기화 중…':'오프라인 · 연결되면 동기화');
  try{
    for(let i=0;i<dates.length;i+=400){
@@ -291,7 +311,7 @@ async function uploadDays(dates,silent=true){
 function flushUploads(){const list=[...dirtyDates];dirtyDates.clear();return uploadDays(list,true)}
 function scheduleCloudUpload(dates,delay=350){
  if(dates)[].concat(dates).forEach(d=>dirtyDates.add(d));
- if(!auth.currentUser||applyingCloud)return;
+ if(!auth.currentUser||applyingCloud||deletingAccount)return;
  clearTimeout(uploadTimer);
  uploadTimer=setTimeout(flushUploads,delay);
 }
@@ -344,10 +364,99 @@ function startRealtime(user){
    }
  },e=>{console.error('snapshot',e);setSyncStatus('실시간 동기화 실패','error')});
 }
+const authMsg={
+ 'auth/invalid-email':'이메일 형식이 올바르지 않아요.',
+ 'auth/missing-email':'이메일을 입력해주세요.',
+ 'auth/email-already-in-use':'이미 가입된 이메일이에요. 로그인해 주세요.',
+ 'auth/weak-password':'비밀번호는 6자 이상으로 정해주세요.',
+ 'auth/invalid-credential':'이메일 또는 비밀번호가 맞지 않아요.',
+ 'auth/wrong-password':'비밀번호가 맞지 않아요.',
+ 'auth/user-not-found':'가입되지 않은 이메일이에요.',
+ 'auth/too-many-requests':'시도가 너무 많았어요. 잠시 뒤에 다시 해주세요.',
+ 'auth/network-request-failed':'네트워크 연결을 확인해주세요.',
+ 'auth/requires-recent-login':'보안을 위해 다시 로그인한 뒤 시도해주세요.',
+ 'auth/user-disabled':'사용할 수 없는 계정이에요.'
+};
+const authErr=e=>(authMsg[e?.code]||'알 수 없는 오류가 발생했어요.')+'\n\n오류 코드: '+(e?.code||'unknown');
+
 async function login(email,password){
  if(!email||!password){alert('이메일과 비밀번호를 입력해주세요.');return}
  try{setSyncStatus('로그인 중…');await signInWithEmailAndPassword(auth,email.trim(),password)}
- catch(e){setSyncStatus('로그인 실패 · '+(e?.code||''),'error');alert('로그인하지 못했어요.\n\n오류 코드: '+(e?.code||'unknown')+'\n\n'+(e?.message||''))}
+ catch(e){setSyncStatus('로그인 실패 · '+(e?.code||''),'error');alert('로그인하지 못했어요.\n\n'+authErr(e))}
+}
+
+let signupMode=false;
+function setAuthMode(on){
+ signupMode=!!on;
+ $('#signupConfirm').hidden=!signupMode;
+ $('#emailLoginBtn').textContent=signupMode?'가입하기':'로그인';
+ $('#modeToggleBtn').textContent=signupMode?'이미 계정이 있어요':'회원가입';
+ $('#loginPassword').autocomplete=signupMode?'new-password':'current-password';
+}
+async function signup(email,password,confirmPw){
+ email=(email||'').trim();
+ if(!email||!password){alert('이메일과 비밀번호를 입력해주세요.');return}
+ if(password.length<6){alert(authMsg['auth/weak-password']);return}
+ if(password!==confirmPw){alert('비밀번호 확인이 달라요. 다시 확인해주세요.');return}
+ try{
+   setSyncStatus('가입 중…');
+   await createUserWithEmailAndPassword(auth,email,password);
+   $('#signupConfirm').value='';setAuthMode(false);toast('가입했어요.');
+ }catch(e){setSyncStatus('가입 실패','error');alert('가입하지 못했어요.\n\n'+authErr(e))}
+}
+async function resetPassword(email){
+ email=(email||'').trim();
+ if(!email){alert('비밀번호를 찾을 이메일을 위 칸에 입력해주세요.');return}
+ try{await sendPasswordResetEmail(auth,email)}
+ catch(e){if(e?.code!=='auth/user-not-found'){alert('메일을 보내지 못했어요.\n\n'+authErr(e));return}}
+ alert('가입된 이메일이라면 비밀번호 재설정 메일이 곧 도착해요.\n받은편지함과 스팸함을 확인해주세요.');
+}
+
+let deletingAccount=false;
+function openDeleteBox(){$('#deleteBox').hidden=false;$('#deleteOpenBtn').hidden=true;$('#deletePassword').focus()}
+function closeDeleteBox(){
+ $('#deleteBox').hidden=true;$('#deleteOpenBtn').hidden=false;
+ $('#deletePassword').value='';$('#deleteLocalToo').checked=false;
+}
+async function deleteCloudData(user){
+ const col=collection(db,'users',user.uid,'apps','yeobaek','days');
+ const snap=await getDocs(col);
+ const refs=[];snap.forEach(s=>refs.push(s.ref));
+ for(let i=0;i<refs.length;i+=400){
+   const batch=writeBatch(db);
+   refs.slice(i,i+400).forEach(r=>batch.delete(r));
+   await batch.commit();
+ }
+ await deleteDoc(doc(db,'users',user.uid,'apps','yeobaek'));
+}
+function clearLocalEntries(){
+ const keys=[];
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('yeobaek:'))keys.push(k)}
+ keys.forEach(k=>localStorage.removeItem(k));
+ renderAll();
+}
+async function deleteAccount(){
+ const user=auth.currentUser;if(!user)return;
+ const pw=$('#deletePassword').value;
+ if(!pw){alert('비밀번호를 입력해주세요.');return}
+ if(!confirm('계정과 클라우드에 저장된 모든 기록을 영구 삭제할까요?\n되돌릴 수 없어요.'))return;
+ const btn=$('#deleteConfirmBtn');btn.disabled=true;
+ try{
+   await reauthenticateWithCredential(user,EmailAuthProvider.credential(user.email,pw));
+   deletingAccount=true;
+   clearTimeout(uploadTimer);dirtyDates.clear();
+   if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null}
+   await deleteCloudData(user);
+   await deleteUser(user);
+   if($('#deleteLocalToo').checked)clearLocalEntries();
+   deletingAccount=false;
+   closeDeleteBox();toast('계정을 삭제했어요.');
+ }catch(e){
+   console.error('delete account',e);
+   deletingAccount=false;
+   alert('계정을 삭제하지 못했어요.\n\n'+authErr(e));
+   if(auth.currentUser){await syncNow(true);startRealtime(auth.currentUser)}
+ }finally{btn.disabled=false}
 }
 window.addEventListener('online',()=>{if(auth.currentUser){setSyncStatus('연결됨 · 동기화 중…');syncNow(true)}});
 window.addEventListener('offline',()=>setSyncStatus('오프라인 · 이 기기에 저장 중'));
@@ -355,6 +464,7 @@ window.addEventListener('offline',()=>setSyncStatus('오프라인 · 이 기기�
 onAuthStateChanged(auth,async user=>{
  setAccount(user); $('#loginBox')?.toggleAttribute('hidden',!!user); $('#logoutBtn')?.toggleAttribute('hidden',!user);
  $('#syncNowBtn').disabled=!user;
+ $('#deleteCard')?.toggleAttribute('hidden',!user); if(!user)closeDeleteBox();
  if(user){
    daysCol=collection(db,'users',user.uid,'apps','yeobaek','days');
    legacyRef=doc(db,'users',user.uid,'apps','yeobaek');
@@ -442,8 +552,15 @@ function switchView(n,remember=true){
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
 
 function collectBackupData(){return {app:'여백',format:'yeobaek-backup',version:2,exportedAt:new Date().toISOString(),entries:collectLocalEntries()}}
-$('#emailLoginBtn')?.addEventListener('click',()=>login($('#loginEmail').value,$('#loginPassword').value));
-$('#loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')$('#emailLoginBtn')?.click()});
+$('#emailLoginBtn')?.addEventListener('click',()=>signupMode?signup($('#loginEmail').value,$('#loginPassword').value,$('#signupConfirm').value):login($('#loginEmail').value,$('#loginPassword').value));
+$('#modeToggleBtn')?.addEventListener('click',()=>setAuthMode(!signupMode));
+$('#forgotBtn')?.addEventListener('click',()=>resetPassword($('#loginEmail').value));
+$('#signupConfirm')?.addEventListener('keydown',e=>{if(e.key==='Enter')$('#emailLoginBtn')?.click()});
+$('#deleteOpenBtn')?.addEventListener('click',openDeleteBox);
+$('#deleteCancelBtn')?.addEventListener('click',closeDeleteBox);
+$('#deleteConfirmBtn')?.addEventListener('click',deleteAccount);
+$('#deletePassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')deleteAccount()});
+$('#loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter'){if(signupMode&&!$('#signupConfirm').value)$('#signupConfirm').focus();else $('#emailLoginBtn')?.click()}});
 $('#logoutBtn')?.addEventListener('click',()=>signOut(auth));
 $('#syncNowBtn')?.addEventListener('click',()=>syncNow(false));
 $('#backupBtn')?.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('전체 백업 파일을 만들었어요.')});
@@ -478,6 +595,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-5');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-6');
 </script>
 </body></html>
