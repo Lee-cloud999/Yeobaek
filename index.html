@@ -77,7 +77,7 @@ input{height:34px}textarea{resize:none;height:80px}
 .archiveDay,.settingCard{background:rgba(255,252,248,.72);border:1px solid #dfd2c8;border-radius:15px;padding:13px;margin-bottom:9px}.archiveDate{font-size:15px;margin-bottom:9px}.archiveGroup{margin-top:9px}.archiveLabel,.todaySavedLabel{font:bold 9px Arial;letter-spacing:1.4px;color:#9a7764;margin:8px 0 5px}
 .searchBox{position:relative;margin:2px 0 8px}.searchBox input{height:38px;padding-right:34px;background:rgba(255,252,248,.9);-webkit-appearance:none;appearance:none}.searchBox input::-webkit-search-cancel-button{-webkit-appearance:none}.searchClear{position:absolute;right:4px;top:3px;width:32px;height:32px;border:0;background:transparent;color:#9a7964;font-size:20px;padding:0}.archiveInfo{font-size:11.5px;color:#87746a;margin:0 4px 8px;min-height:0}.archiveInfo:empty{display:none}
 .monthHead{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:#e9ddd3;color:#59463b;border-radius:13px;padding:11px 14px;margin:2px 0 9px;font-family:inherit;font-size:15px;text-align:left}.monthHead small{font-size:11.5px;color:#87746a}.monthHead .arrow{display:inline-block;width:16px;transition:transform .15s;color:#8a6552}.monthHead[aria-expanded="true"] .arrow{transform:rotate(90deg)}
-.recAct{display:flex;gap:2px;align-items:flex-start}.editBtn{border:0;background:transparent;color:#9a7964;font-size:14px;line-height:1;padding:2px 5px;cursor:pointer}mark{background:#f1d9a8;color:inherit;border-radius:3px;padding:0 1px}
+.recAct{display:flex;gap:0;align-items:center;height:24px}.recAct .editBtn,.recAct .del{width:26px;height:24px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;line-height:1;font-family:Arial,sans-serif}.recAct .editBtn{font-size:15px}.recAct .del{font-size:18px}.editBtn{border:0;background:transparent;color:#9a7964;font-size:14px;line-height:1;padding:2px 5px;cursor:pointer}mark{background:#f1d9a8;color:inherit;border-radius:3px;padding:0 1px}
 .editBox{flex:1;display:flex;flex-direction:column;gap:6px}.editBox textarea{height:84px;font-size:14px;background:#fffdf9}.editBtns{display:flex;gap:6px;justify-content:flex-end}.editBtns button{border:0;border-radius:99px;padding:6px 14px;font-family:inherit;font-size:12px;background:#e5d7cd;color:#59463b}.editBtns .save{background:var(--brown);color:#fff}
 .record{display:flex;gap:8px;align-items:flex-start;background:#f4ebe4;border-radius:10px;padding:8px 9px;margin:5px 0;font-size:13px;line-height:1.5}.recordText{flex:1;white-space:pre-wrap;word-break:break-word}.del{border:0;background:transparent;color:#9a7968;font-size:17px;padding:0 2px}
 .wordRecord{display:inline-flex;align-items:center;gap:3px;background:#e5d7cd;border-radius:99px;padding:5px 7px 5px 10px;margin:3px;font-size:12px}.emptyState{padding:34px 12px;text-align:center;color:#9b8a80;font-size:14px;line-height:1.7}
@@ -665,6 +665,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-8');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-9');
 </script>
 </body></html>
