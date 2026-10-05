@@ -492,8 +492,8 @@ function render(){
  $('#recent').innerHTML=x.words.map((w,i)=>`<span class="chip">${esc(w)} ${deleteButton(dk,'words',i,false)}</span>`).join('');
  if(document.activeElement!==$('#sentence')) $('#sentence').value=x.draftSentence||'';
  if(document.activeElement!==$('#paragraph')) $('#paragraph').value=x.draftParagraph||'';
- $('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(dk,'sentences',i,true)}</div>`).join(''):'';
- $('#todayParagraphs').innerHTML=x.paragraphs.length?'<div class="todaySavedLabel">오늘 저장한 문단</div>'+x.paragraphs.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(dk,'paragraphs',i,true)}</div>`).join(''):'';
+ $('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>recordHTML(dk,'sentences',v,i,'')).join(''):'';
+ $('#todayParagraphs').innerHTML=x.paragraphs.length?'<div class="todaySavedLabel">오늘 저장한 문단</div>'+x.paragraphs.map((v,i)=>recordHTML(dk,'paragraphs',v,i,'')).join(''):'';
 }
 function addRecord(type,value){
  const x=loadByDate(); x[type].push(value); x._ids[type].push(uid()); saveLocal(x); render();
@@ -573,9 +573,9 @@ document.addEventListener('click',e=>{
  const mt=t.closest('.month-toggle');
  if(mt){const m=mt.dataset.month;if(openMonths===null)openMonths=new Set();openMonths.has(m)?openMonths.delete(m):openMonths.add(m);renderArchive();return}
  const eb=t.closest('.edit-record');
- if(eb){const date=eb.dataset.date,type=eb.dataset.type,index=Number(eb.dataset.index);const x=loadEntryByDate(date);editing={date,type,index,text:(x[type]||[])[index]??''};renderArchive();const ta=$('#archiveList .editArea');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
- if(t.closest('.edit-cancel')){editing=null;renderArchive();return}
- if(t.closest('.edit-save')){const ta=$('#archiveList .editArea');if(ta&&editing)editItem(editing.date,editing.type,editing.index,ta.value);return}
+ if(eb){const date=eb.dataset.date,type=eb.dataset.type,index=Number(eb.dataset.index);const x=loadEntryByDate(date);editing={date,type,index,text:(x[type]||[])[index]??''};renderAll();const ta=[...document.querySelectorAll('.editArea')].find(a=>a.offsetParent);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
+ if(t.closest('.edit-cancel')){editing=null;renderAll();return}
+ if(t.closest('.edit-save')){const ta=t.closest('.editBox').querySelector('.editArea');if(ta&&editing)editItem(editing.date,editing.type,editing.index,ta.value);return}
 });
 document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('editArea')&&editing)editing.text=e.target.value});
 function loadEntryByDate(date){try{return normalize(JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}'),date)}catch{return blank()}}
@@ -583,8 +583,8 @@ function editItem(date,type,index,text){
  text=String(text||'').trim();
  if(!text){toast('내용을 입력해 주세요.');return}
  const x=loadEntryByDate(date);
- if(!x[type]||index<0||index>=x[type].length){editing=null;renderArchive();return}
- if(x[type][index]===text){editing=null;renderArchive();return}
+ if(!x[type]||index<0||index>=x[type].length){editing=null;renderAll();return}
+ if(x[type][index]===text){editing=null;renderAll();return}
  // 병합은 ID 기준이라, 수정은 "옛 ID 삭제 + 새 ID로 같은 자리에 저장"으로 처리해 다른 기기에도 확실히 반영한다.
  const old=x._ids[type][index]; if(old)x._deleted.push(old);
  x[type][index]=text; x._ids[type][index]=uid();
@@ -665,6 +665,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-7');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-8');
 </script>
 </body></html>
