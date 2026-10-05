@@ -77,6 +77,8 @@ input{height:34px}textarea{resize:none;height:80px}
 .archiveDay,.settingCard{background:rgba(255,252,248,.72);border:1px solid #dfd2c8;border-radius:15px;padding:13px;margin-bottom:9px}.archiveDate{font-size:15px;margin-bottom:9px}.archiveGroup{margin-top:9px}.archiveLabel,.todaySavedLabel{font:bold 9px Arial;letter-spacing:1.4px;color:#9a7764;margin:8px 0 5px}
 .searchBox{position:relative;margin:2px 0 8px}.searchBox input{height:38px;padding-right:34px;background:rgba(255,252,248,.9);-webkit-appearance:none;appearance:none}.searchBox input::-webkit-search-cancel-button{-webkit-appearance:none}.searchClear{position:absolute;right:4px;top:3px;width:32px;height:32px;border:0;background:transparent;color:#9a7964;font-size:20px;padding:0}.archiveInfo{font-size:11.5px;color:#87746a;margin:0 4px 8px;min-height:0}.archiveInfo:empty{display:none}
 .monthHead{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:#e9ddd3;color:#59463b;border-radius:13px;padding:11px 14px;margin:2px 0 9px;font-family:inherit;font-size:15px;text-align:left}.monthHead small{font-size:11.5px;color:#87746a}.monthHead .arrow{display:inline-block;width:16px;transition:transform .15s;color:#8a6552}.monthHead[aria-expanded="true"] .arrow{transform:rotate(90deg)}
+.filterRow{display:flex;gap:6px;margin:0 0 9px}.fchip{border:0;border-radius:99px;padding:6px 14px;font-family:inherit;font-size:12.5px;background:#e9ddd3;color:#6f5d52}.fchip.on{background:var(--brown);color:#fff}
+.pager{display:flex;justify-content:center;align-items:center;gap:4px;margin:8px 0 14px;flex-wrap:wrap}.pager:empty{display:none}.pager button{min-width:34px;height:34px;border:0;border-radius:10px;background:#efe5dc;color:#59463b;font-family:Arial,sans-serif;font-size:14px;padding:0 6px}.pager button.on{background:var(--brown);color:#fff}.pager button:disabled{opacity:.35}
 .recAct{display:flex;gap:0;align-items:center;height:24px}.recAct .editBtn,.recAct .del{width:26px;height:24px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;line-height:1;font-family:Arial,sans-serif}.recAct .editBtn{font-size:15px}.recAct .del{font-size:18px}.editBtn{border:0;background:transparent;color:#9a7964;font-size:14px;line-height:1;padding:2px 5px;cursor:pointer}mark{background:#f1d9a8;color:inherit;border-radius:3px;padding:0 1px}
 .editBox{flex:1;display:flex;flex-direction:column;gap:6px}.editBox textarea{height:84px;font-size:14px;background:#fffdf9}.editBtns{display:flex;gap:6px;justify-content:flex-end}.editBtns button{border:0;border-radius:99px;padding:6px 14px;font-family:inherit;font-size:12px;background:#e5d7cd;color:#59463b}.editBtns .save{background:var(--brown);color:#fff}
 .record{display:flex;gap:8px;align-items:flex-start;background:#f4ebe4;border-radius:10px;padding:8px 9px;margin:5px 0;font-size:13px;line-height:1.5}.recordText{flex:1;white-space:pre-wrap;word-break:break-word}.del{border:0;background:transparent;color:#9a7968;font-size:17px;padding:0 2px}
@@ -113,7 +115,7 @@ input{height:34px}textarea{resize:none;height:80px}
 <section class="card wordcard"><div class="titleline"><div class="titlegroup"><div class="kicker">WORD</div><div class="nameRow"><h2>단어 기록</h2><span class="count" id="wordCount">오늘 0개</span></div></div><button class="plus" id="addWord">＋</button></div><p class="help">떠오르는 단어를 하나씩 남겨보세요.</p><input id="word" autocomplete="off" placeholder="단어를 입력하고 Enter"><div class="chips" id="recent"></div></section>
 <section class="card"><div class="titleline"><div><div class="kicker">SENTENCE</div><h2>문장 기록</h2></div><button class="plus" id="addSentence">＋</button></div><p class="help">기억하고 싶은 한 문장을 적어보세요.</p><textarea id="sentence" placeholder="문장을 입력해 주세요."></textarea><div class="todaySaved" id="todaySentences"></div></section>
 <section class="card paragraph"><div class="titleline"><div><div class="kicker">PARAGRAPH</div><h2>문단 기록</h2></div><button class="plus" id="addParagraph">＋</button></div><p class="help">생각을 조금 더 자유롭게 이어보세요.</p><textarea id="paragraph" placeholder="지금, 하고 싶은 이야기를 적어보세요."></textarea><div class="todaySaved" id="todayParagraphs"></div></section></main>
-<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div class="searchBox"><input id="archiveSearch" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색"><button type="button" id="archiveSearchClear" class="searchClear" aria-label="검색어 지우기" hidden>×</button></div><div id="archiveInfo" class="archiveInfo"></div><div id="archiveList"></div></section>
+<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div class="searchBox"><input id="archiveSearch" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색"><button type="button" id="archiveSearchClear" class="searchClear" aria-label="검색어 지우기" hidden>×</button></div><div class="filterRow" id="archiveFilter"><button type="button" class="fchip on" data-f="all">전체</button><button type="button" class="fchip" data-f="words">단어</button><button type="button" class="fchip" data-f="sentences">문장</button><button type="button" class="fchip" data-f="paragraphs">문단</button></div><div id="archiveInfo" class="archiveInfo"></div><div id="archiveList"></div><nav id="archivePager" class="pager" aria-label="페이지"></nav></section>
 <section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
 <section id="settingsView" class="view subview">
 <div class="subHeader"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관하세요.</p></div>
@@ -182,6 +184,7 @@ const db = getFirestore(app);
 const $ = s => document.querySelector(s);
 const weekdays = ['일','월','화','수','목','금','토'];
 let current = new Date();
+let archiveQuery='',closedMonths=new Set(),editing=null,archiveFilter='all',archivePage=1;const PAGE_DAYS=10;
 let daysCol = null, legacyRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
 const dirtyDates = new Set();
 
@@ -524,7 +527,7 @@ function deleteItem(date,type,index,ask=true){
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.delete-record');if(b)deleteItem(b.dataset.date,b.dataset.type,Number(b.dataset.index),b.dataset.ask==='1')});
 
-let archiveQuery='',openMonths=null,editing=null;
+
 function hl(text,q){
  if(!q)return esc(text);
  const lo=String(text).toLowerCase(),ql=q.toLowerCase();let out='',pos=0,k;
@@ -538,17 +541,17 @@ function recordHTML(date,type,v,i,q){
  return `<div class="record"><div class="recordText">${hl(v,q)}</div><div class="recAct"><button class="editBtn edit-record" data-date="${date}" data-type="${type}" data-index="${i}" aria-label="수정">✎</button>${deleteButton(date,type,i,true)}</div></div>`;
 }
 function renderArchive(){
- const all=allData(),b=$('#archiveList'),info=$('#archiveInfo');
- const q=archiveQuery.trim(),ql=q.toLowerCase();
+ const all=allData(),b=$('#archiveList'),info=$('#archiveInfo'),pager=$('#archivePager');
+ const q=archiveQuery.trim(),ql=q.toLowerCase(),F=archiveFilter;
+ pager.innerHTML='';
  if(!all.length){info.textContent='';b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';return}
  const hit=t=>!q||String(t).toLowerCase().includes(ql);
+ const pick=(arr,type)=>(F==='all'||F===type)?arr.map((v,i)=>[v,i]).filter(p=>hit(p[0])):[];
  let matches=0;
  const days=[];
  for(const r of all){
   const d=r.data,date=r.date;
-  const ws=d.words.map((v,i)=>[v,i]).filter(p=>hit(p[0]));
-  const ss=d.sentences.map((v,i)=>[v,i]).filter(p=>hit(p[0]));
-  const ps=d.paragraphs.map((v,i)=>[v,i]).filter(p=>hit(p[0]));
+  const ws=pick(d.words,'words'),ss=pick(d.sentences,'sentences'),ps=pick(d.paragraphs,'paragraphs');
   const n=ws.length+ss.length+ps.length;
   if(!n)continue;
   matches+=n;
@@ -557,21 +560,37 @@ function renderArchive(){
   const p=ps.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+ps.map(([v,i])=>recordHTML(date,'paragraphs',v,i,q)).join('')+'</div>':'';
   days.push({date,n,html:`<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`});
  }
- info.textContent=q?(matches?`“${q}” 검색 결과 ${matches}건`:''):'';
- if(!days.length){b.innerHTML=`<div class="emptyState">“${esc(q)}”에 맞는 기록이 없어요.</div>`;return}
- const months=[];
- for(const d of days){const m=d.date.slice(0,7);let g=months[months.length-1];if(!g||g.m!==m){g={m,days:[],n:0};months.push(g)}g.days.push(d);g.n+=d.n}
- if(openMonths===null)openMonths=new Set([months[0].m]);
- b.innerHTML=months.map(g=>{
-  const open=q?true:openMonths.has(g.m);
-  const [y,mo]=g.m.split('-').map(Number);
-  return `<button type="button" class="monthHead month-toggle" data-month="${g.m}" aria-expanded="${open}"><span><span class="arrow">▸</span>${y}년 ${mo}월</span><small>${g.days.length}일 · ${g.n}개</small></button>`+(open?g.days.map(d=>d.html).join(''):'');
+ const fname={words:'단어',sentences:'문장',paragraphs:'문단'}[F];
+ info.textContent=(q||F!=='all')?(matches?`${q?`“${q}” `:''}${fname?fname+' ':''}검색 결과 ${matches}건`:''):'';
+ if(!days.length){b.innerHTML=q?`<div class="emptyState">“${esc(q)}”에 맞는 기록이 없어요.</div>`:`<div class="emptyState">${fname||''} 기록이 아직 없어요.</div>`;return}
+ const pages=Math.ceil(days.length/PAGE_DAYS);
+ if(archivePage>pages)archivePage=pages; if(archivePage<1)archivePage=1;
+ const monthTotal={};
+ for(const d of days){const m=d.date.slice(0,7);(monthTotal[m]=monthTotal[m]||{days:0,n:0});monthTotal[m].days++;monthTotal[m].n+=d.n}
+ const slice=days.slice((archivePage-1)*PAGE_DAYS,archivePage*PAGE_DAYS);
+ const groups=[];
+ for(const d of slice){const m=d.date.slice(0,7);let g=groups[groups.length-1];if(!g||g.m!==m){g={m,days:[]};groups.push(g)}g.days.push(d)}
+ b.innerHTML=groups.map(g=>{
+  const open=q?true:!closedMonths.has(g.m);
+  const [y,mo]=g.m.split('-').map(Number),t=monthTotal[g.m];
+  return `<button type="button" class="monthHead month-toggle" data-month="${g.m}" aria-expanded="${open}"><span><span class="arrow">▸</span>${y}년 ${mo}월</span><small>${t.days}일 · ${t.n}개</small></button>`+(open?g.days.map(d=>d.html).join(''):'');
  }).join('');
+ if(pages>1){
+  const start=Math.max(1,Math.min(archivePage-2,pages-4)),end=Math.min(pages,start+4);
+  let h=`<button type="button" class="pg" data-p="${archivePage-1}" ${archivePage===1?'disabled':''} aria-label="이전 페이지">‹</button>`;
+  for(let n=start;n<=end;n++)h+=`<button type="button" class="pg${n===archivePage?' on':''}" data-p="${n}" ${n===archivePage?'aria-current="page"':''}>${n}</button>`;
+  h+=`<button type="button" class="pg" data-p="${archivePage+1}" ${archivePage===pages?'disabled':''} aria-label="다음 페이지">›</button>`;
+  pager.innerHTML=h;
+ }
 }
 document.addEventListener('click',e=>{
  const t=e.target;
  const mt=t.closest('.month-toggle');
- if(mt){const m=mt.dataset.month;if(openMonths===null)openMonths=new Set();openMonths.has(m)?openMonths.delete(m):openMonths.add(m);renderArchive();return}
+ if(mt){const m=mt.dataset.month;closedMonths.has(m)?closedMonths.delete(m):closedMonths.add(m);renderArchive();return}
+ const pg=t.closest('.pg');
+ if(pg&&!pg.disabled){archivePage=Number(pg.dataset.p);renderArchive();window.scrollTo({top:0,behavior:'auto'});return}
+ const fc=t.closest('.fchip');
+ if(fc){archiveFilter=fc.dataset.f;archivePage=1;document.querySelectorAll('#archiveFilter .fchip').forEach(c=>c.classList.toggle('on',c===fc));renderArchive();return}
  const eb=t.closest('.edit-record');
  if(eb){const date=eb.dataset.date,type=eb.dataset.type,index=Number(eb.dataset.index);const x=loadEntryByDate(date);editing={date,type,index,text:(x[type]||[])[index]??''};renderAll();const ta=[...document.querySelectorAll('.editArea')].find(a=>a.offsetParent);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
  if(t.closest('.edit-cancel')){editing=null;renderAll();return}
@@ -592,8 +611,8 @@ function editItem(date,type,index,text){
  editing=null;scheduleCloudUpload(date);renderAll();toast('수정했어요.');
 }
 const _as=$('#archiveSearch'),_ac=$('#archiveSearchClear');
-_as.addEventListener('input',()=>{archiveQuery=_as.value;_ac.hidden=!_as.value;renderArchive()});
-_ac.addEventListener('click',()=>{_as.value='';archiveQuery='';_ac.hidden=true;renderArchive();_as.focus()});
+_as.addEventListener('input',()=>{archiveQuery=_as.value;archivePage=1;_ac.hidden=!_as.value;renderArchive()});
+_ac.addEventListener('click',()=>{_as.value='';archiveQuery='';archivePage=1;_ac.hidden=true;renderArchive();_as.focus()});
 function renderStats(){
   let days=0,words=0,sentences=0,paragraphs=0;
   for(let i=0;i<localStorage.length;i++){
@@ -665,6 +684,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-9');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-10');
 </script>
 </body></html>
