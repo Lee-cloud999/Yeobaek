@@ -75,6 +75,10 @@ input{height:34px}textarea{resize:none;height:80px}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#6e5749;color:white;border-radius:99px;padding:7px 12px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:20}.toast.show{opacity:.95}
 .pullRefresh{position:fixed;z-index:30;left:50%;top:8px;transform:translate(-50%,-52px);padding:7px 13px;border-radius:999px;background:rgba(111,81,66,.92);color:#fff;font-size:11px;letter-spacing:.1px;opacity:0;transition:transform .18s ease,opacity .18s ease;pointer-events:none}.pullRefresh.show{opacity:1}.pullRefresh.ready{transform:translate(-50%,0)}body{overscroll-behavior-y:contain;touch-action:pan-y}.view{display:none}.view.active{display:block}.subview{padding:2px 12px 16px}.pagehead{padding:6px 4px 12px}.pagehead h2{font-size:25px;margin:0 0 5px}.pagehead p{font-size:12px;color:var(--muted);margin:0}
 .archiveDay,.settingCard{background:rgba(255,252,248,.72);border:1px solid #dfd2c8;border-radius:15px;padding:13px;margin-bottom:9px}.archiveDate{font-size:15px;margin-bottom:9px}.archiveGroup{margin-top:9px}.archiveLabel,.todaySavedLabel{font:bold 9px Arial;letter-spacing:1.4px;color:#9a7764;margin:8px 0 5px}
+.searchBox{position:relative;margin:2px 0 8px}.searchBox input{height:38px;padding-right:34px;background:rgba(255,252,248,.9);-webkit-appearance:none;appearance:none}.searchBox input::-webkit-search-cancel-button{-webkit-appearance:none}.searchClear{position:absolute;right:4px;top:3px;width:32px;height:32px;border:0;background:transparent;color:#9a7964;font-size:20px;padding:0}.archiveInfo{font-size:11.5px;color:#87746a;margin:0 4px 8px;min-height:0}.archiveInfo:empty{display:none}
+.monthHead{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:#e9ddd3;color:#59463b;border-radius:13px;padding:11px 14px;margin:2px 0 9px;font-family:inherit;font-size:15px;text-align:left}.monthHead small{font-size:11.5px;color:#87746a}.monthHead .arrow{display:inline-block;width:16px;transition:transform .15s;color:#8a6552}.monthHead[aria-expanded="true"] .arrow{transform:rotate(90deg)}
+.recAct{display:flex;gap:2px;align-items:flex-start}.editBtn{border:0;background:transparent;color:#9a7964;font-size:14px;line-height:1;padding:2px 5px;cursor:pointer}mark{background:#f1d9a8;color:inherit;border-radius:3px;padding:0 1px}
+.editBox{flex:1;display:flex;flex-direction:column;gap:6px}.editBox textarea{height:84px;font-size:14px;background:#fffdf9}.editBtns{display:flex;gap:6px;justify-content:flex-end}.editBtns button{border:0;border-radius:99px;padding:6px 14px;font-family:inherit;font-size:12px;background:#e5d7cd;color:#59463b}.editBtns .save{background:var(--brown);color:#fff}
 .record{display:flex;gap:8px;align-items:flex-start;background:#f4ebe4;border-radius:10px;padding:8px 9px;margin:5px 0;font-size:13px;line-height:1.5}.recordText{flex:1;white-space:pre-wrap;word-break:break-word}.del{border:0;background:transparent;color:#9a7968;font-size:17px;padding:0 2px}
 .wordRecord{display:inline-flex;align-items:center;gap:3px;background:#e5d7cd;border-radius:99px;padding:5px 7px 5px 10px;margin:3px;font-size:12px}.emptyState{padding:34px 12px;text-align:center;color:#9b8a80;font-size:14px;line-height:1.7}
 .statsGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:rgba(255,252,248,.78);border:1px solid #dfd2c8;border-radius:15px;padding:17px 12px;text-align:center}.stat strong{display:block;font-size:27px;font-weight:500}.stat span{font-size:11px;color:var(--muted)}
@@ -109,7 +113,7 @@ input{height:34px}textarea{resize:none;height:80px}
 <section class="card wordcard"><div class="titleline"><div class="titlegroup"><div class="kicker">WORD</div><div class="nameRow"><h2>단어 기록</h2><span class="count" id="wordCount">오늘 0개</span></div></div><button class="plus" id="addWord">＋</button></div><p class="help">떠오르는 단어를 하나씩 남겨보세요.</p><input id="word" autocomplete="off" placeholder="단어를 입력하고 Enter"><div class="chips" id="recent"></div></section>
 <section class="card"><div class="titleline"><div><div class="kicker">SENTENCE</div><h2>문장 기록</h2></div><button class="plus" id="addSentence">＋</button></div><p class="help">기억하고 싶은 한 문장을 적어보세요.</p><textarea id="sentence" placeholder="문장을 입력해 주세요."></textarea><div class="todaySaved" id="todaySentences"></div></section>
 <section class="card paragraph"><div class="titleline"><div><div class="kicker">PARAGRAPH</div><h2>문단 기록</h2></div><button class="plus" id="addParagraph">＋</button></div><p class="help">생각을 조금 더 자유롭게 이어보세요.</p><textarea id="paragraph" placeholder="지금, 하고 싶은 이야기를 적어보세요."></textarea><div class="todaySaved" id="todayParagraphs"></div></section></main>
-<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div id="archiveList"></div></section>
+<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div class="searchBox"><input id="archiveSearch" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색"><button type="button" id="archiveSearchClear" class="searchClear" aria-label="검색어 지우기" hidden>×</button></div><div id="archiveInfo" class="archiveInfo"></div><div id="archiveList"></div></section>
 <section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
 <section id="settingsView" class="view subview">
 <div class="subHeader"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관하세요.</p></div>
@@ -520,15 +524,76 @@ function deleteItem(date,type,index,ask=true){
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.delete-record');if(b)deleteItem(b.dataset.date,b.dataset.type,Number(b.dataset.index),b.dataset.ask==='1')});
 
-function renderArchive(){
- const list=allData(),b=$('#archiveList');
- if(!list.length){b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';return}
- b.innerHTML=list.map(r=>{const d=r.data,date=r.date;
- const w=d.words.length?'<div class="archiveGroup"><div class="archiveLabel">WORD</div>'+d.words.map((v,i)=>`<span class="wordRecord">${esc(v)}${deleteButton(date,'words',i,false)}</span>`).join('')+'</div>':'';
- const s=d.sentences.length?'<div class="archiveGroup"><div class="archiveLabel">SENTENCE</div>'+d.sentences.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(date,'sentences',i,true)}</div>`).join('')+'</div>':'';
- const p=d.paragraphs.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+d.paragraphs.map((v,i)=>`<div class="record"><div class="recordText">${esc(v)}</div>${deleteButton(date,'paragraphs',i,true)}</div>`).join('')+'</div>':'';
- return `<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`}).join('');
+let archiveQuery='',openMonths=null,editing=null;
+function hl(text,q){
+ if(!q)return esc(text);
+ const lo=String(text).toLowerCase(),ql=q.toLowerCase();let out='',pos=0,k;
+ while((k=lo.indexOf(ql,pos))>=0){out+=esc(text.slice(pos,k))+'<mark>'+esc(text.slice(k,k+q.length))+'</mark>';pos=k+q.length}
+ return out+esc(text.slice(pos));
 }
+function recordHTML(date,type,v,i,q){
+ if(editing&&editing.date===date&&editing.type===type&&editing.index===i){
+  return `<div class="record"><div class="editBox"><textarea class="editArea" aria-label="기록 수정">${esc(editing.text)}</textarea><div class="editBtns"><button type="button" class="edit-cancel">취소</button><button type="button" class="save edit-save">저장</button></div></div></div>`;
+ }
+ return `<div class="record"><div class="recordText">${hl(v,q)}</div><div class="recAct"><button class="editBtn edit-record" data-date="${date}" data-type="${type}" data-index="${i}" aria-label="수정">✎</button>${deleteButton(date,type,i,true)}</div></div>`;
+}
+function renderArchive(){
+ const all=allData(),b=$('#archiveList'),info=$('#archiveInfo');
+ const q=archiveQuery.trim(),ql=q.toLowerCase();
+ if(!all.length){info.textContent='';b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';return}
+ const hit=t=>!q||String(t).toLowerCase().includes(ql);
+ let matches=0;
+ const days=[];
+ for(const r of all){
+  const d=r.data,date=r.date;
+  const ws=d.words.map((v,i)=>[v,i]).filter(p=>hit(p[0]));
+  const ss=d.sentences.map((v,i)=>[v,i]).filter(p=>hit(p[0]));
+  const ps=d.paragraphs.map((v,i)=>[v,i]).filter(p=>hit(p[0]));
+  const n=ws.length+ss.length+ps.length;
+  if(!n)continue;
+  matches+=n;
+  const w=ws.length?'<div class="archiveGroup"><div class="archiveLabel">WORD</div>'+ws.map(([v,i])=>`<span class="wordRecord">${hl(v,q)}${deleteButton(date,'words',i,false)}</span>`).join('')+'</div>':'';
+  const s=ss.length?'<div class="archiveGroup"><div class="archiveLabel">SENTENCE</div>'+ss.map(([v,i])=>recordHTML(date,'sentences',v,i,q)).join('')+'</div>':'';
+  const p=ps.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+ps.map(([v,i])=>recordHTML(date,'paragraphs',v,i,q)).join('')+'</div>':'';
+  days.push({date,n,html:`<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`});
+ }
+ info.textContent=q?(matches?`“${q}” 검색 결과 ${matches}건`:''):'';
+ if(!days.length){b.innerHTML=`<div class="emptyState">“${esc(q)}”에 맞는 기록이 없어요.</div>`;return}
+ const months=[];
+ for(const d of days){const m=d.date.slice(0,7);let g=months[months.length-1];if(!g||g.m!==m){g={m,days:[],n:0};months.push(g)}g.days.push(d);g.n+=d.n}
+ if(openMonths===null)openMonths=new Set([months[0].m]);
+ b.innerHTML=months.map(g=>{
+  const open=q?true:openMonths.has(g.m);
+  const [y,mo]=g.m.split('-').map(Number);
+  return `<button type="button" class="monthHead month-toggle" data-month="${g.m}" aria-expanded="${open}"><span><span class="arrow">▸</span>${y}년 ${mo}월</span><small>${g.days.length}일 · ${g.n}개</small></button>`+(open?g.days.map(d=>d.html).join(''):'');
+ }).join('');
+}
+document.addEventListener('click',e=>{
+ const t=e.target;
+ const mt=t.closest('.month-toggle');
+ if(mt){const m=mt.dataset.month;if(openMonths===null)openMonths=new Set();openMonths.has(m)?openMonths.delete(m):openMonths.add(m);renderArchive();return}
+ const eb=t.closest('.edit-record');
+ if(eb){const date=eb.dataset.date,type=eb.dataset.type,index=Number(eb.dataset.index);const x=loadEntryByDate(date);editing={date,type,index,text:(x[type]||[])[index]??''};renderArchive();const ta=$('#archiveList .editArea');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
+ if(t.closest('.edit-cancel')){editing=null;renderArchive();return}
+ if(t.closest('.edit-save')){const ta=$('#archiveList .editArea');if(ta&&editing)editItem(editing.date,editing.type,editing.index,ta.value);return}
+});
+document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('editArea')&&editing)editing.text=e.target.value});
+function loadEntryByDate(date){try{return normalize(JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}'),date)}catch{return blank()}}
+function editItem(date,type,index,text){
+ text=String(text||'').trim();
+ if(!text){toast('내용을 입력해 주세요.');return}
+ const x=loadEntryByDate(date);
+ if(!x[type]||index<0||index>=x[type].length){editing=null;renderArchive();return}
+ if(x[type][index]===text){editing=null;renderArchive();return}
+ // 병합은 ID 기준이라, 수정은 "옛 ID 삭제 + 새 ID로 같은 자리에 저장"으로 처리해 다른 기기에도 확실히 반영한다.
+ const old=x._ids[type][index]; if(old)x._deleted.push(old);
+ x[type][index]=text; x._ids[type][index]=uid();
+ localStorage.setItem('yeobaek:'+date,JSON.stringify(x));
+ editing=null;scheduleCloudUpload(date);renderAll();toast('수정했어요.');
+}
+const _as=$('#archiveSearch'),_ac=$('#archiveSearchClear');
+_as.addEventListener('input',()=>{archiveQuery=_as.value;_ac.hidden=!_as.value;renderArchive()});
+_ac.addEventListener('click',()=>{_as.value='';archiveQuery='';_ac.hidden=true;renderArchive();_as.focus()});
 function renderStats(){
   let days=0,words=0,sentences=0,paragraphs=0;
   for(let i=0;i<localStorage.length;i++){
@@ -600,6 +665,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-6');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-7');
 </script>
 </body></html>
