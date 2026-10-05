@@ -95,6 +95,7 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 .checkRow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#8b7a6e}.checkRow input{width:18px;height:18px;padding:0;margin:0}
 .deleteBtns{display:flex;gap:8px;justify-content:flex-end}
 .dangerBtn{color:#a05d58;border-color:#d9b8b3}
+.settingsNote a{color:#866b59}
 </style>
 
 </head>
@@ -148,6 +149,7 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
     <div class="deleteBtns"><button class="softBtn" id="deleteCancelBtn" type="button">취소</button><button class="softBtn dangerBtn" id="deleteConfirmBtn" type="button">영구 삭제</button></div>
   </div>
 </div>
+<div class="settingsNote"><a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
@@ -595,6 +597,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-6');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-7');
 </script>
 </body></html>
