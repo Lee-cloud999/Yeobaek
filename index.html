@@ -61,8 +61,8 @@ body{color:var(--ink);font-family:"MaruBuri","AppleMyungjo","Noto Serif KR","Bat
 .date{height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;white-space:nowrap}
 .quote{border-top:1px solid #cbb8aa;margin-top:4px;padding-top:8px;min-height:44px;font-size:12.5px;line-height:1.45}
 main{padding:0 12px}.card{border-radius:17px;padding:13px 14px;margin-bottom:9px;background:rgba(232,220,211,.83)}
-.card:nth-child(2){background:#E9DFDC;box-shadow:inset 0 0 0 1px #D8C8C2}#todaySentences .record{background:#F4ECE9}
-.card:nth-child(3){background:rgba(232,220,211,.7)}
+.card:nth-of-type(2){background:#E9DFDC;box-shadow:inset 0 0 0 1px #D8C8C2}#todaySentences .record{background:#F4ECE9}
+.card:nth-of-type(3){background:rgba(232,220,211,.7)}
 .titleline{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}.kicker{font:bold 9px/1.2 Arial;letter-spacing:1.7px;color:#9a7764}
 .nameRow{display:flex;align-items:baseline;gap:8px;margin-top:0}h2{font-size:21px;line-height:1.15;font-weight:500;letter-spacing:-.7px;margin:0}.count{font-size:11px;color:#87746a}
 .help{font-size:11.5px;line-height:1.35;margin:4px 0 8px}.plus{width:36px;height:36px;border:0;border-radius:50%;background:var(--brown);color:#fff;font:24px/36px Arial;padding:0}
@@ -79,6 +79,9 @@ input{height:34px}textarea{resize:none;height:80px}
 .monthHead{width:100%;display:flex;align-items:center;justify-content:space-between;border:0;background:#e9ddd3;color:#59463b;border-radius:13px;padding:11px 14px;margin:2px 0 9px;font-family:inherit;font-size:15px;text-align:left}.monthHead small{font-size:11.5px;color:#87746a}.monthHead .arrow{display:inline-block;width:16px;transition:transform .15s;color:#8a6552}.monthHead[aria-expanded="true"] .arrow{transform:rotate(90deg)}
 .filterRow{display:flex;gap:6px;margin:0 0 9px}.fchip{border:0;border-radius:99px;padding:6px 14px;font-family:inherit;font-size:12.5px;background:#e9ddd3;color:#6f5d52}.fchip.on{background:var(--brown);color:#fff}
 .pager{display:flex;justify-content:center;align-items:center;gap:4px;margin:8px 0 14px;flex-wrap:wrap}.pager:empty{display:none}.pager button{min-width:34px;height:34px;border:0;border-radius:10px;background:#efe5dc;color:#59463b;font-family:Arial,sans-serif;font-size:14px;padding:0 6px}.pager button.on{background:var(--brown);color:#fff}.pager button:disabled{opacity:.35}
+.recall:empty{display:none}.recall{margin:0 0 9px}.recallItem{border-left:3px solid #c9a99b;background:rgba(255,252,248,.62);border-radius:0 12px 12px 0;padding:8px 12px;margin-bottom:6px}.recallLabel{font:bold 9.5px Arial;letter-spacing:1.2px;color:#9a7764}.recallText{font-size:13px;line-height:1.5;margin-top:3px;color:#59463b;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;word-break:break-word}
+.archiveGroup.gW,.archiveGroup.gS,.archiveGroup.gP{border-radius:14px;padding:9px 11px 6px}.archiveGroup.gW{background:rgba(232,220,211,.83)}.archiveGroup.gS{background:#E9DFDC;box-shadow:inset 0 0 0 1px #D8C8C2}.archiveGroup.gS .record{background:#F4ECE9}.archiveGroup.gP{background:rgba(232,220,211,.7)}
+.recAct .favBtn,.recAct .copyBtn{width:26px;height:24px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:#9a7964;padding:0;font-family:Arial,sans-serif;font-size:15px;line-height:1}.recAct .favBtn.on{color:#c58a3f}
 .recAct{display:flex;gap:0;align-items:center;height:24px}.recAct .editBtn,.recAct .del{width:26px;height:24px;display:flex;align-items:center;justify-content:center;padding:0;margin:0;line-height:1;font-family:Arial,sans-serif}.recAct .editBtn{font-size:15px}.recAct .del{font-size:18px}.editBtn{border:0;background:transparent;color:#9a7964;font-size:14px;line-height:1;padding:2px 5px;cursor:pointer}mark{background:#f1d9a8;color:inherit;border-radius:3px;padding:0 1px}
 .editBox{flex:1;display:flex;flex-direction:column;gap:6px}.editBox textarea{height:84px;font-size:14px;background:#fffdf9}.editBtns{display:flex;gap:6px;justify-content:flex-end}.editBtns button{border:0;border-radius:99px;padding:6px 14px;font-family:inherit;font-size:12px;background:#e5d7cd;color:#59463b}.editBtns .save{background:var(--brown);color:#fff}
 .record{display:flex;gap:8px;align-items:flex-start;background:#f4ebe4;border-radius:10px;padding:8px 9px;margin:5px 0;font-size:13px;line-height:1.5}.recordText{flex:1;white-space:pre-wrap;word-break:break-word}.del{border:0;background:transparent;color:#9a7968;font-size:17px;padding:0 2px}
@@ -112,10 +115,11 @@ input{height:34px}textarea{resize:none;height:80px}
 <body><div class="app">
 <header class="top"><div><div class="brand">여백</div><div class="intro">스쳐가는 생각을<br>남겨보세요.</div></div><div class="datebox"><div class="daterow"><button class="navbtn" id="prev">‹</button><div class="date" id="date">오늘</div><button class="navbtn" id="next">›</button></div><div class="quote" id="quote">쓰는 마음이,<br>조금은 가벼워지기를.</div></div></header>
 <main id="writeView" class="view active">
+<div id="recall" class="recall"></div>
 <section class="card wordcard"><div class="titleline"><div class="titlegroup"><div class="kicker">WORD</div><div class="nameRow"><h2>단어 기록</h2><span class="count" id="wordCount">오늘 0개</span></div></div><button class="plus" id="addWord">＋</button></div><p class="help">떠오르는 단어를 하나씩 남겨보세요.</p><input id="word" autocomplete="off" placeholder="단어를 입력하고 Enter"><div class="chips" id="recent"></div></section>
 <section class="card"><div class="titleline"><div><div class="kicker">SENTENCE</div><h2>문장 기록</h2></div><button class="plus" id="addSentence">＋</button></div><p class="help">기억하고 싶은 한 문장을 적어보세요.</p><textarea id="sentence" placeholder="문장을 입력해 주세요."></textarea><div class="todaySaved" id="todaySentences"></div></section>
 <section class="card paragraph"><div class="titleline"><div><div class="kicker">PARAGRAPH</div><h2>문단 기록</h2></div><button class="plus" id="addParagraph">＋</button></div><p class="help">생각을 조금 더 자유롭게 이어보세요.</p><textarea id="paragraph" placeholder="지금, 하고 싶은 이야기를 적어보세요."></textarea><div class="todaySaved" id="todayParagraphs"></div></section></main>
-<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div class="searchBox"><input id="archiveSearch" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색"><button type="button" id="archiveSearchClear" class="searchClear" aria-label="검색어 지우기" hidden>×</button></div><div class="filterRow" id="archiveFilter"><button type="button" class="fchip on" data-f="all">전체</button><button type="button" class="fchip" data-f="words">단어</button><button type="button" class="fchip" data-f="sentences">문장</button><button type="button" class="fchip" data-f="paragraphs">문단</button></div><div id="archiveInfo" class="archiveInfo"></div><div id="archiveList"></div><nav id="archivePager" class="pager" aria-label="페이지"></nav></section>
+<section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div class="searchBox"><input id="archiveSearch" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색"><button type="button" id="archiveSearchClear" class="searchClear" aria-label="검색어 지우기" hidden>×</button></div><div class="filterRow" id="archiveFilter"><button type="button" class="fchip on" data-f="all">전체</button><button type="button" class="fchip" data-f="words">단어</button><button type="button" class="fchip" data-f="sentences">문장</button><button type="button" class="fchip" data-f="paragraphs">문단</button><button type="button" class="fchip" data-f="fav" aria-label="즐겨찾기">★</button></div><div id="archiveInfo" class="archiveInfo"></div><div id="archiveList"></div><nav id="archivePager" class="pager" aria-label="페이지"></nav></section>
 <section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
 <section id="settingsView" class="view subview">
 <div class="subHeader"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관하세요.</p></div>
@@ -200,7 +204,7 @@ $('#quote').innerHTML=q[0]+'<br>'+q[1];
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2));
 const dateKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const storageKey=d=>'yeobaek:'+dateKey(d);
-const blank=()=>({words:[],sentences:[],paragraphs:[],draftSentence:'',draftParagraph:'',_ids:{words:[],sentences:[],paragraphs:[]},_deleted:[],_draftUpdatedAt:0});
+const blank=()=>({words:[],sentences:[],paragraphs:[],draftSentence:'',draftParagraph:'',_ids:{words:[],sentences:[],paragraphs:[]},_deleted:[],_fav:{},_draftUpdatedAt:0});
 
 function stableLegacyId(date,type,value,occurrence=0){
   const s=(date||'unknown')+'|'+type+'|'+String(value||'')+'|'+occurrence;
@@ -232,6 +236,9 @@ function normalize(x={},date=''){
   }
   o._deleted=Array.isArray(o._deleted)?[...new Set(o._deleted)]:[];
   o._draftUpdatedAt=Number(o._draftUpdatedAt)||0;
+  // v7.11: 즐겨찾기 — {기록ID: 시각}. 양수=즐겨찾기, 음수=해제(해제도 기록해야 동기화에서 되살아나지 않는다).
+  const fv={}; if(o._fav&&typeof o._fav==='object'&&!Array.isArray(o._fav))for(const [k,v] of Object.entries(o._fav)){const n=Number(v);if(n&&isFinite(n))fv[k]=n}
+  o._fav=fv;
   return o;
 }
 function loadByDate(d=current){try{return normalize(JSON.parse(localStorage.getItem(storageKey(d))||'{}'),dateKey(d))}catch{return blank()}}
@@ -272,6 +279,8 @@ function mergeEntry(a={},b={},date=''){
    add(b); add(a);
    out._ids[type]=[...map.keys()]; out[type]=[...map.values()];
  }
+ out._fav={};
+ for(const src of [a,b])for(const [k,v] of Object.entries(src._fav||{})){const cur=out._fav[k];if(cur===undefined||Math.abs(v)>Math.abs(cur))out._fav[k]=v}
  const newest=(a._draftUpdatedAt||0)>=(b._draftUpdatedAt||0)?a:b;
  out.draftSentence=newest.draftSentence||'';
  out.draftParagraph=newest.draftParagraph||'';
@@ -292,7 +301,7 @@ function loadLocalEntry(date){try{return normalize(JSON.parse(localStorage.getIt
 function entrySig(e,date){
   const n=normalize(e||{},date),ids={};
   for(const t of ['words','sentences','paragraphs'])ids[t]=[...n._ids[t]].sort();
-  return JSON.stringify([ids,[...n._deleted].sort(),n.draftSentence,n.draftParagraph,n._draftUpdatedAt]);
+  return JSON.stringify([ids,[...n._deleted].sort(),n.draftSentence,n.draftParagraph,n._draftUpdatedAt,Object.entries(n._fav).sort()]);
 }
 function isEmptyEntry(e){
   const n=normalize(e||{});
@@ -489,14 +498,14 @@ onAuthStateChanged(auth,async user=>{
 });
 
 function render(){
- const x=loadByDate(),dk=dateKey(current);
+ const x=loadByDate(),dk=dateKey(current);renderRecall();
  $('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];
  $('#wordCount').textContent='오늘 '+x.words.length+'개';
  $('#recent').innerHTML=x.words.map((w,i)=>`<span class="chip">${esc(w)} ${deleteButton(dk,'words',i,false)}</span>`).join('');
  if(document.activeElement!==$('#sentence')) $('#sentence').value=x.draftSentence||'';
  if(document.activeElement!==$('#paragraph')) $('#paragraph').value=x.draftParagraph||'';
- $('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>recordHTML(dk,'sentences',v,i,'')).join(''):'';
- $('#todayParagraphs').innerHTML=x.paragraphs.length?'<div class="todaySavedLabel">오늘 저장한 문단</div>'+x.paragraphs.map((v,i)=>recordHTML(dk,'paragraphs',v,i,'')).join(''):'';
+ $('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>recordHTML(dk,'sentences',v,i,'',isFav(x,'sentences',i))).join(''):'';
+ $('#todayParagraphs').innerHTML=x.paragraphs.length?'<div class="todaySavedLabel">오늘 저장한 문단</div>'+x.paragraphs.map((v,i)=>recordHTML(dk,'paragraphs',v,i,'',isFav(x,'paragraphs',i))).join(''):'';
 }
 function addRecord(type,value){
  const x=loadByDate(); x[type].push(value); x._ids[type].push(uid()); saveLocal(x); render();
@@ -534,11 +543,12 @@ function hl(text,q){
  while((k=lo.indexOf(ql,pos))>=0){out+=esc(text.slice(pos,k))+'<mark>'+esc(text.slice(k,k+q.length))+'</mark>';pos=k+q.length}
  return out+esc(text.slice(pos));
 }
-function recordHTML(date,type,v,i,q){
+const isFav=(x,type,i)=>{const id=(x._ids[type]||[])[i];return !!id&&(x._fav[id]||0)>0};
+function recordHTML(date,type,v,i,q,fav){
  if(editing&&editing.date===date&&editing.type===type&&editing.index===i){
   return `<div class="record"><div class="editBox"><textarea class="editArea" aria-label="기록 수정">${esc(editing.text)}</textarea><div class="editBtns"><button type="button" class="edit-cancel">취소</button><button type="button" class="save edit-save">저장</button></div></div></div>`;
  }
- return `<div class="record"><div class="recordText">${hl(v,q)}</div><div class="recAct"><button class="editBtn edit-record" data-date="${date}" data-type="${type}" data-index="${i}" aria-label="수정">✎</button>${deleteButton(date,type,i,true)}</div></div>`;
+ return `<div class="record"><div class="recordText">${hl(v,q)}</div><div class="recAct"><button class="favBtn fav-record${fav?' on':''}" data-date="${date}" data-type="${type}" data-index="${i}" aria-label="${fav?'즐겨찾기 해제':'즐겨찾기'}" aria-pressed="${!!fav}">${fav?'★':'☆'}</button><button class="copyBtn copy-record" data-date="${date}" data-type="${type}" data-index="${i}" aria-label="복사">⧉</button><button class="editBtn edit-record" data-date="${date}" data-type="${type}" data-index="${i}" aria-label="수정">✎</button>${deleteButton(date,type,i,true)}</div></div>`;
 }
 function renderArchive(){
  const all=allData(),b=$('#archiveList'),info=$('#archiveInfo'),pager=$('#archivePager');
@@ -546,23 +556,23 @@ function renderArchive(){
  pager.innerHTML='';
  if(!all.length){info.textContent='';b.innerHTML='<div class="emptyState">아직 모아볼 기록이 없어요.<br>쓰기에서 첫 기록을 남겨보세요.</div>';return}
  const hit=t=>!q||String(t).toLowerCase().includes(ql);
- const pick=(arr,type)=>(F==='all'||F===type)?arr.map((v,i)=>[v,i]).filter(p=>hit(p[0])):[];
+ const pick=(arr,type,d)=>{if(F==='fav')return type==='words'?[]:arr.map((v,i)=>[v,i]).filter(p=>hit(p[0])&&isFav(d,type,p[1]));return (F==='all'||F===type)?arr.map((v,i)=>[v,i]).filter(p=>hit(p[0])):[]};
  let matches=0;
  const days=[];
  for(const r of all){
   const d=r.data,date=r.date;
-  const ws=pick(d.words,'words'),ss=pick(d.sentences,'sentences'),ps=pick(d.paragraphs,'paragraphs');
+  const ws=pick(d.words,'words',d),ss=pick(d.sentences,'sentences',d),ps=pick(d.paragraphs,'paragraphs',d);
   const n=ws.length+ss.length+ps.length;
   if(!n)continue;
   matches+=n;
-  const w=ws.length?'<div class="archiveGroup"><div class="archiveLabel">WORD</div>'+ws.map(([v,i])=>`<span class="wordRecord">${hl(v,q)}${deleteButton(date,'words',i,false)}</span>`).join('')+'</div>':'';
-  const s=ss.length?'<div class="archiveGroup"><div class="archiveLabel">SENTENCE</div>'+ss.map(([v,i])=>recordHTML(date,'sentences',v,i,q)).join('')+'</div>':'';
-  const p=ps.length?'<div class="archiveGroup"><div class="archiveLabel">PARAGRAPH</div>'+ps.map(([v,i])=>recordHTML(date,'paragraphs',v,i,q)).join('')+'</div>':'';
+  const w=ws.length?'<div class="archiveGroup gW"><div class="archiveLabel">WORD</div>'+ws.map(([v,i])=>`<span class="wordRecord">${hl(v,q)}${deleteButton(date,'words',i,false)}</span>`).join('')+'</div>':'';
+  const s=ss.length?'<div class="archiveGroup gS"><div class="archiveLabel">SENTENCE</div>'+ss.map(([v,i])=>recordHTML(date,'sentences',v,i,q,isFav(d,'sentences',i))).join('')+'</div>':'';
+  const p=ps.length?'<div class="archiveGroup gP"><div class="archiveLabel">PARAGRAPH</div>'+ps.map(([v,i])=>recordHTML(date,'paragraphs',v,i,q,isFav(d,'paragraphs',i))).join('')+'</div>':'';
   days.push({date,n,html:`<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`});
  }
- const fname={words:'단어',sentences:'문장',paragraphs:'문단'}[F];
- info.textContent=(q||F!=='all')?(matches?`${q?`“${q}” `:''}${fname?fname+' ':''}검색 결과 ${matches}건`:''):'';
- if(!days.length){b.innerHTML=q?`<div class="emptyState">“${esc(q)}”에 맞는 기록이 없어요.</div>`:`<div class="emptyState">${fname||''} 기록이 아직 없어요.</div>`;return}
+ const fname={words:'단어',sentences:'문장',paragraphs:'문단',fav:'즐겨찾기'}[F];
+ info.textContent=(q||F!=='all')?(matches?`${q?`“${q}” `:''}${fname?fname+' ':''}${q?'검색 결과 ':''}${matches}건`:''):'';
+ if(!days.length){b.innerHTML=q?`<div class="emptyState">“${esc(q)}”에 맞는 기록이 없어요.</div>`:F==='fav'?'<div class="emptyState">즐겨찾기한 기록이 없어요.<br>문장·문단의 ☆를 눌러 추가해보세요.</div>':`<div class="emptyState">${fname||''} 기록이 아직 없어요.</div>`;return}
  const pages=Math.ceil(days.length/PAGE_DAYS);
  if(archivePage>pages)archivePage=pages; if(archivePage<1)archivePage=1;
  const monthTotal={};
@@ -591,6 +601,10 @@ document.addEventListener('click',e=>{
  if(pg&&!pg.disabled){archivePage=Number(pg.dataset.p);renderArchive();window.scrollTo({top:0,behavior:'auto'});return}
  const fc=t.closest('.fchip');
  if(fc){archiveFilter=fc.dataset.f;archivePage=1;document.querySelectorAll('#archiveFilter .fchip').forEach(c=>c.classList.toggle('on',c===fc));renderArchive();return}
+ const fb=t.closest('.fav-record');
+ if(fb){toggleFav(fb.dataset.date,fb.dataset.type,Number(fb.dataset.index));return}
+ const cb=t.closest('.copy-record');
+ if(cb){const x=loadEntryByDate(cb.dataset.date);const v=(x[cb.dataset.type]||[])[Number(cb.dataset.index)];if(v!=null)copyText(v).then(ok=>toast(ok?'복사했어요.':'복사하지 못했어요.'));return}
  const eb=t.closest('.edit-record');
  if(eb){const date=eb.dataset.date,type=eb.dataset.type,index=Number(eb.dataset.index);const x=loadEntryByDate(date);editing={date,type,index,text:(x[type]||[])[index]??''};renderAll();const ta=[...document.querySelectorAll('.editArea')].find(a=>a.offsetParent);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
  if(t.closest('.edit-cancel')){editing=null;renderAll();return}
@@ -598,6 +612,29 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('editArea')&&editing)editing.text=e.target.value});
 function loadEntryByDate(date){try{return normalize(JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}'),date)}catch{return blank()}}
+function toggleFav(date,type,index){
+ const x=loadEntryByDate(date),id=(x._ids[type]||[])[index];if(!id)return;
+ const on=(x._fav[id]||0)>0;x._fav[id]=(on?-1:1)*Date.now();
+ localStorage.setItem('yeobaek:'+date,JSON.stringify(x));scheduleCloudUpload(date);renderAll();toast(on?'즐겨찾기를 해제했어요.':'즐겨찾기에 추가했어요.');
+}
+async function copyText(t){
+ try{await navigator.clipboard.writeText(t);return true}catch{}
+ try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(a);a.select();const ok=document.execCommand('copy');a.remove();return ok}catch{return false}
+}
+function renderRecall(){
+ const box=$('#recall');if(!box)return;
+ const y=current.getFullYear(),m=current.getMonth(),d=current.getDate();
+ const cands=[['작년 오늘',new Date(y-1,m,d)],['한 달 전 오늘',new Date(y,m-1,d)]];
+ const out=[];
+ for(const [label,dt] of cands){
+  if(dt.getDate()!==d)continue; // 없는 날짜(예: 2월 30일)는 건너뜀
+  const date=dateKey(dt),x=loadEntryByDate(date);
+  const text=x.sentences[0]||x.paragraphs[0]||(x.words.length?x.words.join(', '):'');
+  if(!text)continue;
+  out.push(`<div class="recallItem"><div class="recallLabel">${label} · ${dt.getFullYear()}.${dt.getMonth()+1}.${dt.getDate()}</div><div class="recallText">${esc(text)}</div></div>`);
+ }
+ box.innerHTML=out.join('');
+}
 function editItem(date,type,index,text){
  text=String(text||'').trim();
  if(!text){toast('내용을 입력해 주세요.');return}
@@ -606,7 +643,8 @@ function editItem(date,type,index,text){
  if(x[type][index]===text){editing=null;renderAll();return}
  // 병합은 ID 기준이라, 수정은 "옛 ID 삭제 + 새 ID로 같은 자리에 저장"으로 처리해 다른 기기에도 확실히 반영한다.
  const old=x._ids[type][index]; if(old)x._deleted.push(old);
- x[type][index]=text; x._ids[type][index]=uid();
+ const wasFav=old&&(x._fav[old]||0)>0;
+ x[type][index]=text; x._ids[type][index]=uid(); if(wasFav)x._fav[x._ids[type][index]]=Date.now();
  localStorage.setItem('yeobaek:'+date,JSON.stringify(x));
  editing=null;scheduleCloudUpload(date);renderAll();toast('수정했어요.');
 }
@@ -684,6 +722,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-10');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-11');
 </script>
 </body></html>
