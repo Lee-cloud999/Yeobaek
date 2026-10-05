@@ -160,13 +160,12 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, se
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCOy8x5kPeJUUqRUjEHRqckT2ReULEoUac",
-  authDomain: "maeum-jogak2.firebaseapp.com",
-  projectId: "maeum-jogak2",
-  storageBucket: "maeum-jogak2.firebasestorage.app",
-  messagingSenderId: "942972843404",
-  appId: "1:942972843404:web:d209eebd2e1f647d09d2a9",
-  measurementId: "G-BQH27N81B7"
+  apiKey: "AIzaSyBTvUMPlKUUL6o8XfL-sJoy_Z6IqGrlPYc",
+  authDomain: "yeobaek-app.firebaseapp.com",
+  projectId: "yeobaek-app",
+  storageBucket: "yeobaek-app.firebasestorage.app",
+  messagingSenderId: "684650626952",
+  appId: "1:684650626952:web:0987a8a51f260ef45b843d"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -597,6 +596,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-9');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-0');
 </script>
 </body></html>
