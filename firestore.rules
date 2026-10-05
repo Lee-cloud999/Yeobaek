@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// 여백 전용 Firebase 프로젝트용 Firestore 보안 규칙
+// 로그인한 본인(uid)만 자신의 users/{uid}/apps/yeobaek 아래 데이터를 읽고 쓸 수 있고,
+// 그 밖의 모든 경로는 막혀 있다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // 예전 방식 단일 문서(마이그레이션 표시 · 계정 삭제 시 정리용)
+    match /users/{uid}/apps/yeobaek {
+      allow read, write: if isOwner(uid);
+    }
+
+    // 날짜별 기록 문서: 문서 ID는 YYYY-MM-DD 형식만 허용
+    match /users/{uid}/apps/yeobaek/days/{day} {
+      allow read: if isOwner(uid);
+      allow create, update, delete: if isOwner(uid)
+        && day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+  }
+}
