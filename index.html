@@ -135,7 +135,7 @@ input{height:34px}textarea{resize:none;height:68px}.paragraph textarea{height:11
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, writeBatch, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCOy8x5kPeJUUqRUjEHRqckT2ReULEoUac",
@@ -153,7 +153,8 @@ const db = getFirestore(app);
 const $ = s => document.querySelector(s);
 const weekdays = ['일','월','화','수','목','금','토'];
 let current = new Date();
-let cloudRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
+let daysCol = null, legacyRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
+const dirtyDates = new Set();
 
 const quotes = [
  ['쓰는 마음이,','조금은 가벼워지기를.'],['오늘의 생각이,','조용히 머물기를.'],
@@ -202,9 +203,9 @@ function normalize(x={},date=''){
   return o;
 }
 function loadByDate(d=current){try{return normalize(JSON.parse(localStorage.getItem(storageKey(d))||'{}'),dateKey(d))}catch{return blank()}}
-function saveLocal(x,d=current,queue=true){
+function saveLocal(x,d=current,queue=true,delay=350){
   localStorage.setItem(storageKey(d),JSON.stringify(normalize(x,dateKey(d))));
-  if(queue) scheduleCloudUpload();
+  if(queue) scheduleCloudUpload(dateKey(d),delay);
 }
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),900)}
@@ -254,49 +255,92 @@ function mergeAll(a={},b={}){
 function setSyncStatus(text,kind=''){const e=$('#syncStatus');if(e){e.textContent=text;e.dataset.kind=kind}}
 function setAccount(user){$('#accountStatus').textContent=user?(user.email||'로그인됨'):'로그인하지 않음'}
 
-async function uploadCloud(silent=true){
- if(!auth.currentUser||!cloudRef||applyingCloud)return;
- const entries=collectLocalEntries();
+// v6.5: 기록을 날짜별 문서(users/{uid}/apps/yeobaek/days/{날짜})로 나눠 저장한다.
+function loadLocalEntry(date){try{return normalize(JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}'),date)}catch{return blank()}}
+function entrySig(e,date){
+  const n=normalize(e||{},date),ids={};
+  for(const t of ['words','sentences','paragraphs'])ids[t]=[...n._ids[t]].sort();
+  return JSON.stringify([ids,[...n._deleted].sort(),n.draftSentence,n.draftParagraph,n._draftUpdatedAt]);
+}
+function isEmptyEntry(e){
+  const n=normalize(e||{});
+  return !n.words.length&&!n.sentences.length&&!n.paragraphs.length&&!n.draftSentence&&!n.draftParagraph&&!n._deleted.length;
+}
+
+async function uploadDays(dates,silent=true){
+ if(!auth.currentUser||!daysCol||applyingCloud||!dates.length)return true;
  setSyncStatus(navigator.onLine?'동기화 중…':'오프라인 · 연결되면 동기화');
  try{
-   await setDoc(cloudRef,{app:'yeobaek',version:2,entries,updatedAt:serverTimestamp()},{merge:true});
+   for(let i=0;i<dates.length;i+=400){
+     const batch=writeBatch(db);
+     for(const d of dates.slice(i,i+400))
+       batch.set(doc(daysCol,d),{app:'yeobaek',version:3,date:d,entry:loadLocalEntry(d),updatedAt:serverTimestamp()});
+     await batch.commit();
+   }
    localStorage.setItem('yeobaek:lastSync',new Date().toISOString());
    setSyncStatus('자동 동기화 완료','ok');
+   return true;
  }catch(e){
    console.error('sync upload',e);
+   dates.forEach(d=>dirtyDates.add(d));
    setSyncStatus(navigator.onLine?'동기화 실패':'오프라인 · 연결되면 동기화','error');
    if(!silent) alert('동기화하지 못했어요.\n\n오류 코드: '+(e?.code||'unknown'));
+   return false;
  }
 }
-function scheduleCloudUpload(){
+function flushUploads(){const list=[...dirtyDates];dirtyDates.clear();return uploadDays(list,true)}
+function scheduleCloudUpload(dates,delay=350){
+ if(dates)[].concat(dates).forEach(d=>dirtyDates.add(d));
  if(!auth.currentUser||applyingCloud)return;
  clearTimeout(uploadTimer);
- uploadTimer=setTimeout(()=>uploadCloud(true),350);
+ uploadTimer=setTimeout(flushUploads,delay);
 }
 async function syncNow(silent=false){
- if(!auth.currentUser){if(!silent)alert('먼저 이메일로 로그인해주세요.');return}
+ if(!auth.currentUser||!daysCol){if(!silent)alert('먼저 이메일로 로그인해주세요.');return}
  try{
    setSyncStatus('동기화 중…');
-   const snap=await getDoc(cloudRef);
-   const cloud=snap.exists()?(snap.data().entries||{}):{};
-   const merged=mergeAll(collectLocalEntries(),cloud);
+   const snap=await getDocs(daysCol);
+   const daysCloud={};
+   snap.forEach(s=>{const e=s.data().entry;if(e)daysCloud[s.id]=e});
+   // 예전 방식(문서 하나)에 남은 기록이 있으면 한 번 합쳐서 날짜별 문서로 옮긴다. 예전 문서는 지우지 않는다.
+   let source=daysCloud,legacyPending=false;
+   try{
+     const ls=await getDoc(legacyRef);
+     if(ls.exists()&&!ls.data().migratedToDays){legacyPending=true;source=mergeAll(daysCloud,ls.data().entries||{})}
+   }catch(e){console.warn('legacy read',e)}
+   const merged=mergeAll(collectLocalEntries(),source);
    putLocalEntries(merged); renderAll();
-   await setDoc(cloudRef,{app:'yeobaek',version:2,entries:merged,updatedAt:serverTimestamp()},{merge:true});
-   setSyncStatus('동기화 완료','ok');
+   const changed=Object.keys(merged).filter(d=>{
+     if(!daysCloud[d])return !isEmptyEntry(merged[d]);
+     return entrySig(merged[d],d)!==entrySig(daysCloud[d],d);
+   });
+   const ok=await uploadDays(changed,silent);
+   if(ok&&legacyPending){
+     try{await setDoc(legacyRef,{migratedToDays:true,migratedAt:serverTimestamp()},{merge:true})}
+     catch(e){console.warn('migration flag',e)}
+   }
+   if(ok)setSyncStatus('동기화 완료','ok');
  }catch(e){console.error(e);setSyncStatus('동기화 실패','error');if(!silent)alert('동기화하지 못했어요.\n\n오류 코드: '+(e?.code||'unknown'))}
 }
 function startRealtime(user){
  if(unsubscribeCloud)unsubscribeCloud();
- cloudRef=doc(db,'users',user.uid,'apps','yeobaek');
- unsubscribeCloud=onSnapshot(cloudRef,{includeMetadataChanges:true},snap=>{
-   if(!snap.exists())return;
-   const cloud=snap.data().entries||{};
-   const merged=mergeAll(collectLocalEntries(),cloud);
-   putLocalEntries(merged); renderAll();
+ unsubscribeCloud=onSnapshot(daysCol,{includeMetadataChanges:true},snap=>{
+   const cloud={},pending={};
+   snap.docChanges().forEach(ch=>{
+     if(ch.type==='removed')return;
+     const e=ch.doc.data().entry; if(!e)return;
+     cloud[ch.doc.id]=e; pending[ch.doc.id]=ch.doc.metadata.hasPendingWrites;
+   });
+   const merged={},changed=[];
+   for(const d of Object.keys(cloud)){
+     merged[d]=mergeEntry(loadLocalEntry(d),cloud[d],d);
+     if(!pending[d]&&entrySig(merged[d],d)!==entrySig(cloud[d],d))changed.push(d);
+   }
+   if(Object.keys(merged).length){putLocalEntries(merged);renderAll()}
    if(!snap.metadata.hasPendingWrites){
      setSyncStatus(snap.metadata.fromCache?'오프라인 캐시':'자동 동기화됨','ok');
-     // If this device had unique local data, send merged result back.
-     clearTimeout(uploadTimer); uploadTimer=setTimeout(()=>uploadCloud(true),250);
+     // 이 기기에만 있던 내용이 있으면 합친 결과를 바뀐 날짜만 다시 올린다.
+     if(changed.length){changed.forEach(d=>dirtyDates.add(d));clearTimeout(uploadTimer);uploadTimer=setTimeout(flushUploads,250)}
    }
  },e=>{console.error('snapshot',e);setSyncStatus('실시간 동기화 실패','error')});
 }
@@ -312,12 +356,13 @@ onAuthStateChanged(auth,async user=>{
  setAccount(user); $('#loginBox')?.toggleAttribute('hidden',!!user); $('#logoutBtn')?.toggleAttribute('hidden',!user);
  $('#syncNowBtn').disabled=!user;
  if(user){
-   cloudRef=doc(db,'users',user.uid,'apps','yeobaek');
+   daysCol=collection(db,'users',user.uid,'apps','yeobaek','days');
+   legacyRef=doc(db,'users',user.uid,'apps','yeobaek');
    setSyncStatus('로그인됨 · 동기화 중…');
    await syncNow(true); startRealtime(user);
  }else{
    if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null}
-   cloudRef=null; setSyncStatus('이 기기에만 저장 중');
+   daysCol=null; legacyRef=null; dirtyDates.clear(); setSyncStatus('이 기기에만 저장 중');
  }
 });
 
@@ -337,8 +382,8 @@ function addRecord(type,value){
 function addWord(){const e=$('#word'),v=e.value.trim();if(!v)return;addRecord('words',v);e.value='';toast('단어를 저장했어요.')}
 $('#word').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addWord()}});
 $('#addWord').addEventListener('click',addWord);
-$('#sentence').addEventListener('input',e=>{const x=loadByDate();x.draftSentence=e.target.value;x._draftUpdatedAt=Date.now();saveLocal(x)});
-$('#paragraph').addEventListener('input',e=>{const x=loadByDate();x.draftParagraph=e.target.value;x._draftUpdatedAt=Date.now();saveLocal(x)});
+$('#sentence').addEventListener('input',e=>{const x=loadByDate();x.draftSentence=e.target.value;x._draftUpdatedAt=Date.now();saveLocal(x,current,true,2000)});
+$('#paragraph').addEventListener('input',e=>{const x=loadByDate();x.draftParagraph=e.target.value;x._draftUpdatedAt=Date.now();saveLocal(x,current,true,2000)});
 $('#addSentence').addEventListener('click',()=>{const v=$('#sentence').value.trim();if(!v)return;const x=loadByDate();x.sentences.push(v);x._ids.sentences.push(uid());x.draftSentence='';x._draftUpdatedAt=Date.now();saveLocal(x);render();toast('문장을 저장했어요.')});
 $('#addParagraph').addEventListener('click',()=>{const v=$('#paragraph').value.trim();if(!v)return;const x=loadByDate();x.paragraphs.push(v);x._ids.paragraphs.push(uid());x.draftParagraph='';x._draftUpdatedAt=Date.now();saveLocal(x);render();toast('문단을 저장했어요.')});
 $('#prev').addEventListener('click',()=>{current.setDate(current.getDate()-1);render()});
@@ -356,7 +401,7 @@ function deleteItem(date,type,index,ask=true){
  if(!x[type]||index<0||index>=x[type].length)return;
  const id=x._ids[type][index]; if(id)x._deleted.push(id);
  x[type].splice(index,1);x._ids[type].splice(index,1);
- localStorage.setItem(k,JSON.stringify(x));scheduleCloudUpload();renderAll();toast('삭제했어요.');
+ localStorage.setItem(k,JSON.stringify(x));scheduleCloudUpload(date);renderAll();toast('삭제했어요.');
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.delete-record');if(b)deleteItem(b.dataset.date,b.dataset.type,Number(b.dataset.index),b.dataset.ask==='1')});
 
@@ -402,7 +447,7 @@ $('#loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')$('#email
 $('#logoutBtn')?.addEventListener('click',()=>signOut(auth));
 $('#syncNowBtn')?.addEventListener('click',()=>syncNow(false));
 $('#backupBtn')?.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('전체 백업 파일을 만들었어요.')});
-$('#restoreInput')?.addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const backup=JSON.parse(await file.text());if(!backup.entries)throw 0;const merged=mergeAll(collectLocalEntries(),backup.entries);putLocalEntries(merged);renderAll();toast('백업을 복원했어요.');scheduleCloudUpload()}catch{alert('《여백》 백업 파일을 읽지 못했어요.')}e.target.value=''});
+$('#restoreInput')?.addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const backup=JSON.parse(await file.text());if(!backup.entries)throw 0;const merged=mergeAll(collectLocalEntries(),backup.entries);putLocalEntries(merged);renderAll();toast('백업을 복원했어요.');scheduleCloudUpload(Object.keys(merged))}catch{alert('《여백》 백업 파일을 읽지 못했어요.')}e.target.value=''});
 
 // Pull-to-refresh: keep current menu and perform cloud sync when logged in.
 const pullRefresh=$('#pullRefresh');let pullStartY=null,pullDistance=0,pullTracking=false;const PULL_TRIGGER=78;
@@ -433,6 +478,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-4');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-5');
 </script>
 </body></html>
