@@ -1,5 +1,5 @@
-const CACHE='yeobaek-v6-3-stats-fix-20260923';
-const APP=['./?v=6-3','./index.html?v=6-3','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const CACHE='yeobaek-v6-4-dup-delete-fix-20261005';
+const APP=['./?v=6-4','./index.html?v=6-4','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -16,9 +16,9 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=6-3',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=6-4',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=6-3'))
+      }).catch(()=>caches.match('./index.html?v=6-4'))
     );
     return;
   }

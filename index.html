@@ -183,17 +183,15 @@ function normalize(x={},date=''){
   o._ids=o._ids||{words:[],sentences:[],paragraphs:[]};
   for(const type of ['words','sentences','paragraphs']){
     const ids=Array.isArray(o._ids[type])?o._ids[type]:[];
-    const seenText=new Map(), newVals=[], newIds=[], seenIds=new Set(), seenLegacyContent=new Set();
+    const seenText=new Map(), newVals=[], newIds=[], seenIds=new Set();
     o[type].forEach((value,i)=>{
       const text=String(value??'');
       const occurrence=seenText.get(text)||0; seenText.set(text,occurrence+1);
       let id=ids[i];
-      // v6 may have assigned different random IDs to the same old content on each device.
-      // For duplicate content already present, collapse to one item during repair.
-      const contentKey=text;
-      if(seenLegacyContent.has(contentKey)) return;
-      seenLegacyContent.add(contentKey);
-      if(!id || /^legacy-/.test(id)) id=stableLegacyId(date,type,text,0);
+      // v6.4: 같은 내용도 여러 번 기록할 수 있도록 내용이 아니라 ID로만 구분한다.
+      // ID가 없는 옛 기록에만 (날짜·종류·내용·몇 번째인지)로 고정 ID를 부여하고,
+      // 이미 부여된 ID는 그대로 둔다(중간 항목을 지워도 ID가 밀리지 않게).
+      if(!id) id=stableLegacyId(date,type,text,occurrence);
       if(seenIds.has(id)) return;
       seenIds.add(id); newVals.push(text); newIds.push(id);
     });
@@ -227,16 +225,16 @@ function putLocalEntries(entries={}){
  for(const [date,data] of Object.entries(entries)) localStorage.setItem('yeobaek:'+date,JSON.stringify(normalize(data,date)));
  applyingCloud=false;
 }
-function mergeEntry(a={},b={}){
- a=normalize(a); b=normalize(b);
+function mergeEntry(a={},b={},date=''){
+ a=normalize(a,date); b=normalize(b,date);
  const deleted=new Set([...(a._deleted||[]),...(b._deleted||[])]);
  const out=blank(); out._deleted=[...deleted];
  for(const type of ['words','sentences','paragraphs']){
-   const map=new Map(), contentSeen=new Set();
+   const map=new Map();
    const add=(src)=>src[type].forEach((v,i)=>{
-     const id=src._ids[type][i]; const content=String(v??'');
-     if(!id||deleted.has(id)||map.has(id)||contentSeen.has(content))return;
-     map.set(id,v);contentSeen.add(content);
+     const id=src._ids[type][i];
+     if(!id||deleted.has(id)||map.has(id))return;
+     map.set(id,v);
    });
    add(b); add(a);
    out._ids[type]=[...map.keys()]; out[type]=[...map.values()];
@@ -249,7 +247,7 @@ function mergeEntry(a={},b={}){
 }
 function mergeAll(a={},b={}){
  const out={};
- for(const d of new Set([...Object.keys(a),...Object.keys(b)])) out[d]=mergeEntry(a[d]||{},b[d]||{});
+ for(const d of new Set([...Object.keys(a),...Object.keys(b)])) out[d]=mergeEntry(a[d]||{},b[d]||{},d);
  return out;
 }
 
@@ -354,7 +352,7 @@ function allData(){
 function prettyDate(s){const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]);return a[0]+'년 '+a[1]+'월 '+a[2]+'일 '+weekdays[d.getDay()]+'요일'}
 function deleteItem(date,type,index,ask=true){
  if(ask&&!confirm('이 기록을 삭제할까요?'))return;
- const k='yeobaek:'+date; let x;try{x=normalize(JSON.parse(localStorage.getItem(k)||'{}'))}catch{return}
+ const k='yeobaek:'+date; let x;try{x=normalize(JSON.parse(localStorage.getItem(k)||'{}'),date)}catch{return}
  if(!x[type]||index<0||index>=x[type].length)return;
  const id=x._ids[type][index]; if(id)x._deleted.push(id);
  x[type].splice(index,1);x._ids[type].splice(index,1);
@@ -435,6 +433,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-3');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=6-4');
 </script>
 </body></html>
