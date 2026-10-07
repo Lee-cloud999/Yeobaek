@@ -5,7 +5,7 @@
 .word{font-family:"MaruBuri","AppleMyungjo","Batang",serif;font-weight:600}
 </style>
 </defs>
-<rect width="512" height="512" rx="112" fill="#f5eee7"/>
+<rect width="512" height="512" rx="112" fill="#f3e9de"/>
 <rect x="22" y="22" width="468" height="468" rx="94" fill="none" stroke="#d9c9bd" stroke-width="4"/>
-<text x="256" y="282" text-anchor="middle" dominant-baseline="middle" class="word" font-size="116" fill="#654f42" letter-spacing="-8">여백</text>
+<text x="256" y="282" text-anchor="middle" dominant-baseline="middle" class="word" font-size="116" fill="#5a3a2b" letter-spacing="-8">여백</text>
 </svg>

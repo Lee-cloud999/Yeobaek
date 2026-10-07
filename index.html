@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f7f1ea">
+<meta name="theme-color" content="#f8f0e7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="여백">
@@ -111,6 +111,35 @@ input{height:34px}textarea{resize:none;height:80px}
 .settingsNote a{color:#866b59}
 </style>
 
+<style id="theme-mocha">
+/* v7.12 모카 크림(초코 브라운) 테마 */
+:root{--ink:#3b271d;--muted:#8c5f47;--line:#cdb29d;--brown:#5a3a2b;--chip:#dcc3ae}
+html,body{background:#eadfd5}
+.app{background:linear-gradient(#fbf5ee,#f3e9de)}
+.kicker,.recallLabel,.archiveLabel,.todaySavedLabel{color:#8c5f47}.count,.help{color:#6b4636}
+.navbtn{background:#e8d6c7;color:#3b271d}.quote{border-top-color:#cdb29d}
+.card:nth-of-type(1){background:#e8d6c7}
+.card:nth-of-type(2){background:#dcc0a9;box-shadow:inset 0 0 0 1px #c4a48b}
+.card:nth-of-type(3){background:#eadccf}
+input,textarea{background:#fffaf4;border-color:#cdb29d;color:#3b271d}
+input::placeholder,textarea::placeholder{color:#ab9283}
+.record{background:#f4e8dc}#todaySentences .record{background:#f2e1d2}
+.chip,.wordRecord{background:#dcc3ae;color:#3b271d}
+.plus{background:#5a3a2b}
+.bottom{background:rgba(248,240,231,.97);border-top-color:#cdb29d}
+.tab{color:#8c5f47}.tab.active{color:#3b271d}
+.del,.editBtn,.favBtn,.copyBtn,.recAct .favBtn,.recAct .copyBtn{color:#8c5f47}.recAct .favBtn.on{color:#b9732f}
+.archiveDay,.settingCard,.stat{background:rgba(255,250,244,.78);border-color:#e0cfc0}
+.archiveGroup.gW{background:#e8d6c7}.archiveGroup.gS{background:#dcc0a9;box-shadow:inset 0 0 0 1px #c4a48b}.archiveGroup.gS .record{background:#f2e1d2}.archiveGroup.gP{background:#eadccf}
+.monthHead{background:#e8d6c7;color:#3b271d}.monthHead small{color:#8c5f47}.monthHead .arrow{color:#5a3a2b}
+.fchip{background:#e8d6c7;color:#5a3a2b}.fchip.on{background:#5a3a2b;color:#fff}
+.pager button{background:#eadccf;color:#3b271d}.pager button.on{background:#5a3a2b;color:#fff}
+.recallItem{border-left-color:#b78f74;background:rgba(255,250,244,.7)}.recallText{color:#3b271d}
+.searchClear{color:#8c5f47}.archiveInfo{color:#6b4636}
+.toast{background:#5a3a2b}.pullRefresh{background:rgba(90,58,43,.93)}
+.editBtns .save{background:#5a3a2b;color:#fff}.editBtns button{background:#e3cfbf;color:#3b271d}
+mark{background:#efd29c}
+</style>
 </head>
 <body><div class="app">
 <header class="top"><div><div class="brand">여백</div><div class="intro">스쳐가는 생각을<br>남겨보세요.</div></div><div class="datebox"><div class="daterow"><button class="navbtn" id="prev">‹</button><div class="date" id="date">오늘</div><button class="navbtn" id="next">›</button></div><div class="quote" id="quote">쓰는 마음이,<br>조금은 가벼워지기를.</div></div></header>
@@ -722,6 +751,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-11');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-12');
 </script>
 </body></html>
