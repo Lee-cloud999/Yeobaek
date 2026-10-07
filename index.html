@@ -156,7 +156,7 @@ mark{background:#efd29c}
 .sameLine{font-size:12.5px;line-height:1.5;color:#6b4636;margin:0 0 8px}.toolNote{font-size:13px;margin:4px 0 10px}
 .toolBtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.tbtn{border:0;border-radius:99px;padding:8px 15px;font-family:inherit;font-size:13px;background:#e8d6c7;color:#3b271d}.tbtn.primary{background:#5a3a2b;color:#fff}.tbtn:disabled{opacity:.4}
 .toolEmpty{font-size:13px;line-height:1.6;color:#8c5f47;padding:8px 2px}
-.pickChips{display:flex;flex-wrap:wrap;gap:7px}.pickChip{border:0;border-radius:99px;padding:6px 13px;font-family:inherit;font-size:14px;background:#eadccf;color:#3b271d}.pickChip.on{background:#5a3a2b;color:#fff}
+.pickChips{display:flex;flex-wrap:wrap;gap:7px}.pickChip{border:0;border-radius:99px;padding:6px 13px;font-family:inherit;font-size:14px;background:#eadccf;color:#3b271d}.pickChip.on{background:#5a3a2b;color:#fff}.pickChip small{opacity:.65;font-size:11px}.sortRow{margin:0 0 10px}.moreRow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}.randRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}.randLabel{font-size:12.5px;color:#6b4636;margin-right:2px}
 .mixInfo{font-size:12px;color:#6b4636;margin:10px 2px 0}
 .pickList{max-height:260px;overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
 .pickRow{display:flex;gap:9px;align-items:flex-start;text-align:left;border:0;border-radius:11px;background:#f4e8dc;color:#3b271d;padding:9px 10px;font-family:inherit}.pickRow.on{background:#dcc3ae}
@@ -245,7 +245,7 @@ const db = getFirestore(app);
 const $ = s => document.querySelector(s);
 const weekdays = ['일','월','화','수','목','금','토'];
 let current = new Date();
-let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],mixSel:[],mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''},toolItems=null;
+let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''},toolItems=null;
 let archiveQuery='',closedMonths=new Set(),editing=null,archiveFilter='all',archivePage=1;const PAGE_DAYS=10;
 let daysCol = null, legacyRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
 const dirtyDates = new Set();
@@ -756,10 +756,13 @@ function pickPiece(random){
  if(random){let n=Math.floor(Math.random()*pool.length);if(pool.length>1&&tl.piece&&pool[n].id===tl.piece.id)n=(n+1)%pool.length;tl.piece=pool[n]}
  else tl.piece=pool[hashStr(dateKey(new Date())+'|piece')%pool.length];
 }
+function buildWordList(){
+ const seen=new Map(),list=[];
+ for(const w of toolItems.words){const k=w.text.trim().toLowerCase();if(!k)continue;const e=seen.get(k);if(e){e.count++;continue}const o=Object.assign({count:1},w);seen.set(k,o);list.push(o)}
+ tl.wordList=list;return list;
+}
 function pickWord(random){
- const seen=new Set(),list=[];
- for(const w of toolItems.words){const k=w.text.trim().toLowerCase();if(!k||seen.has(k))continue;seen.add(k);list.push(w)}
- tl.wordList=list;
+ const list=buildWordList();
  if(!list.length){tl.word=null;return}
  if(random){let n=Math.floor(Math.random()*list.length);if(list.length>1&&tl.word&&list[n].text===tl.word.text)n=(n+1)%list.length;tl.word=list[n]}
  else tl.word=list[hashStr(dateKey(new Date())+'|word')%list.length];
@@ -778,12 +781,21 @@ function cardListHTML(){
  return rows.map(x=>`<button type="button" class="pickRow" data-act="card-pick" data-id="${esc(x.id)}"><span class="pickNo">${x.type==='paragraphs'?'문단':'문장'}</span><span class="pickBody"><span class="pickText">${esc(x.text)}</span><span class="pickDate">${shortDate(x.date)}</span></span></button>`).join('');
 }
 function pickBoxHTML(){
- const ws=(tl.wordList||[]).slice(0,60);
- if(!ws.length)return '<div class="toolEmpty">아직 단어가 없어요. 쓰기에서 단어를 모아보세요.</div>';
+ const all=tl.wordList||[];
+ if(!all.length)return '<div class="toolEmpty">아직 단어가 없어요. 쓰기에서 단어를 모아보세요.</div>';
+ let sorted=[...all];
+ if(tl.pickSort==='freq')sorted.sort((x,y)=>y.count-x.count);
+ else if(tl.pickSort==='abc')sorted.sort((x,y)=>x.text.localeCompare(y.text,'ko'));
+ let ws=sorted.slice(0,tl.pickShown);
+ for(const w of tl.pickWords){if(!ws.some(x=>x.text===w)){const f=all.find(x=>x.text===w);if(f)ws.push(f)}}
  const n=tl.pickWords.length;
- return '<div class="pickChips">'+ws.map(w=>`<button type="button" class="pickChip${tl.pickWords.includes(w.text)?' on':''}" data-act="pick-toggle" data-w="${esc(w.text)}">${esc(w.text)}</button>`).join('')+'</div>'
+ const sorts={recent:'최근',freq:'자주 쓴',abc:'가나다'};
+ return `<div class="chipRow sortRow">${Object.entries(sorts).map(([k,t])=>`<button type="button" class="fchip${tl.pickSort===k?' on':''}" data-act="pick-sort" data-v="${k}">${t}</button>`).join('')}</div>`
+ +'<div class="pickChips">'+ws.map(w=>`<button type="button" class="pickChip${tl.pickWords.includes(w.text)?' on':''}" data-act="pick-toggle" data-w="${esc(w.text)}">${esc(w.text)}${tl.pickSort==='freq'&&w.count>1?`<small> ×${w.count}</small>`:''}</button>`).join('')+'</div>'
+ +(all.length>15?`<div class="moreRow"><span class="mixInfo" style="margin:0">전체 ${all.length}개 중 ${Math.min(ws.length,all.length)}개</span>${sorted.length>tl.pickShown?`<button type="button" class="tbtn" data-act="pick-more">더 보기 (+${Math.min(15,sorted.length-tl.pickShown)})</button>`:''}${tl.pickShown>15?'<button type="button" class="tbtn" data-act="pick-less">접기</button>':''}</div><div class="mixInfo" style="margin-top:4px">무작위 뽑기는 전체 단어에서 골라요.</div>`:'')
  +`<div class="mixInfo">${n?`글감 ${n}개: ${esc(tl.pickWords.join(', '))}`:'쓰고 싶은 단어를 눌러 고르세요.'}</div>`
- +`<div class="toolBtns"><button type="button" class="tbtn" data-act="pick-random">무작위 3개</button><button type="button" class="tbtn" data-act="pick-clear" ${n?'':'disabled'}>선택 해제</button><button type="button" class="tbtn primary" data-act="pick-sentence" ${n?'':'disabled'}>문장으로 쓰기</button><button type="button" class="tbtn primary" data-act="pick-paragraph" ${n?'':'disabled'}>문단으로 쓰기</button></div>`;
+ +`<div class="randRow"><span class="randLabel">무작위</span>${[2,3,4,5].map(k=>`<button type="button" class="fchip${tl.randN===k?' on':''}" data-act="rand-n" data-v="${k}">${k}개</button>`).join('')}<button type="button" class="tbtn" data-act="pick-random">뽑기</button></div>`
+ +`<div class="toolBtns"><button type="button" class="tbtn" data-act="pick-clear" ${n?'':'disabled'}>선택 해제</button><button type="button" class="tbtn primary" data-act="pick-sentence" ${n?'':'disabled'}>문장으로 쓰기</button><button type="button" class="tbtn primary" data-act="pick-paragraph" ${n?'':'disabled'}>문단으로 쓰기</button></div>`;
 }
 function renderTools(){
  const box=$('#toolsBody');if(!box)return;
@@ -817,7 +829,7 @@ function renderTools(){
  drawCard();
 }
 function pickPiece_label(){const I=toolItems;tl.pieceLabel=I.sentences.some(x=>x.fav)?'즐겨찾기한 문장 중에서':I.sentences.length?'모아 둔 문장 중에서':I.paragraphs.some(x=>x.fav)?'즐겨찾기한 문단 중에서':'모아 둔 문단 중에서'}
-function pickWord_list(){const seen=new Set(),list=[];for(const w of toolItems.words){const k=w.text.trim().toLowerCase();if(!k||seen.has(k))continue;seen.add(k);list.push(w)}tl.wordList=list}
+function pickWord_list(){buildWordList()}
 function wrapCard(c,text,maxW,size){
  c.font=`${size}px ${CARD_FONT}`;const lines=[];
  for(const para of text.split('\n')){
@@ -879,7 +891,11 @@ document.addEventListener('click',async e=>{
  else if(a==='word-next'){pickWord(true);renderTools()}
  else if(a==='word-write'){if(tl.word)startWriting('sentences',[tl.word.text])}
  else if(a==='pick-toggle'){const w=b.dataset.w,k=tl.pickWords.indexOf(w);k>=0?tl.pickWords.splice(k,1):tl.pickWords.push(w);$('#pickBox').innerHTML=pickBoxHTML()}
- else if(a==='pick-random'){const l=[...(tl.wordList||[])];for(let i=l.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[l[i],l[j]]=[l[j],l[i]]}tl.pickWords=l.slice(0,3).map(x=>x.text);$('#pickBox').innerHTML=pickBoxHTML()}
+ else if(a==='pick-more'){tl.pickShown+=15;$('#pickBox').innerHTML=pickBoxHTML()}
+ else if(a==='pick-less'){tl.pickShown=15;$('#pickBox').innerHTML=pickBoxHTML()}
+ else if(a==='pick-sort'){tl.pickSort=b.dataset.v;tl.pickShown=15;$('#pickBox').innerHTML=pickBoxHTML()}
+ else if(a==='rand-n'){tl.randN=Number(b.dataset.v);$('#pickBox').innerHTML=pickBoxHTML()}
+ else if(a==='pick-random'){const l=[...(tl.wordList||[])];for(let i=l.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[l[i],l[j]]=[l[j],l[i]]}tl.pickWords=l.slice(0,tl.randN).map(x=>x.text);$('#pickBox').innerHTML=pickBoxHTML();if(l.length<tl.randN)toast('단어가 '+l.length+'개뿐이라 모두 골랐어요.')}
  else if(a==='pick-clear'){tl.pickWords=[];$('#pickBox').innerHTML=pickBoxHTML()}
  else if(a==='pick-sentence'){startWriting('sentences',tl.pickWords)}
  else if(a==='pick-paragraph'){startWriting('paragraphs',tl.pickWords)}
@@ -953,6 +969,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-20');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-22');
 </script>
 </body></html>
