@@ -146,9 +146,9 @@ mark{background:#efd29c}
 .recordText{padding-top:1px}
 
 /* 글감 배너 (입력칸 바로 위) */
-.seedBanner{display:flex;align-items:flex-start;gap:8px;background:#5a3a2b;color:#fff;border-radius:12px;padding:7px 7px 7px 12px;margin:0 0 7px}
-.seedBanner[hidden]{display:none}.seedBody{flex:1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}.seedLabel{font-size:11.5px;opacity:.8;margin-right:2px}.seedChip{background:rgba(255,255,255,.18);border-radius:99px;padding:2px 11px;font-size:14px;line-height:1.5}
-.seedClose{flex:none;width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:17px;line-height:1;padding:0}
+.seedBanner{display:flex;align-items:flex-start;gap:8px;background:#5a3a2b;color:#e8d3bf;border-radius:12px;padding:7px 7px 7px 12px;margin:0 0 7px}
+.seedBanner[hidden]{display:none}.seedBody{flex:1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}.seedLabel{font-size:11.5px;opacity:.8;margin-right:2px}.seedChip{background:rgba(232,211,191,.16);color:#e8d3bf;border-radius:99px;padding:2px 11px;font-size:14px;line-height:1.5}
+.seedClose{flex:none;width:26px;height:26px;border:0;border-radius:50%;background:rgba(232,211,191,.16);color:#e8d3bf;font-size:17px;line-height:1;padding:0}
 /* v7.20 활용 탭 */
 .bottom{grid-template-columns:repeat(5,1fr)}
 .toolCard{background:rgba(255,250,244,.78);border:1px solid #e0cfc0;border-radius:15px;padding:14px;margin-bottom:12px}
@@ -989,6 +989,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-24');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-25');
 </script>
 </body></html>
