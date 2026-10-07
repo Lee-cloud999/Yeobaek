@@ -796,9 +796,9 @@ function pickBoxHTML(){
  const sorts={recent:'최근',freq:'자주 쓴',abc:'가나다'};
  return `<div class="chipRow sortRow">${Object.entries(sorts).map(([k,t])=>`<button type="button" class="fchip${tl.pickSort===k?' on':''}" data-act="pick-sort" data-v="${k}">${t}</button>`).join('')}</div>`
  +'<div class="pickChips">'+ws.map(w=>`<button type="button" class="pickChip${tl.pickWords.includes(w.text)?' on':''}" data-act="pick-toggle" data-w="${esc(w.text)}">${esc(w.text)}${tl.pickSort==='freq'&&w.count>1?`<small> ×${w.count}</small>`:''}</button>`).join('')+'</div>'
- +(all.length>15?`<div class="moreRow"><span class="mixInfo" style="margin:0">전체 ${all.length}개 중 ${Math.min(ws.length,all.length)}개</span>${sorted.length>tl.pickShown?`<button type="button" class="tbtn" data-act="pick-more">더 보기 (+${Math.min(15,sorted.length-tl.pickShown)})</button>`:''}${tl.pickShown>15?'<button type="button" class="tbtn" data-act="pick-less">접기</button>':''}</div><div class="mixInfo" style="margin-top:4px">무작위 뽑기는 전체 단어에서 골라요.</div>`:'')
+ +(all.length>15?`<div class="moreRow"><span class="mixInfo" style="margin:0">전체 ${all.length}개 중 ${Math.min(ws.length,all.length)}개</span>${sorted.length>tl.pickShown?`<button type="button" class="tbtn" data-act="pick-more">더 보기 (+${Math.min(15,sorted.length-tl.pickShown)})</button>`:''}${tl.pickShown>15?'<button type="button" class="tbtn" data-act="pick-less">접기</button>':''}</div><div class="mixInfo" style="margin-top:4px">무작위 선택은 전체 단어에서 골라요.</div>`:'')
  +`<div class="mixInfo">${n?`글감 ${n}개: ${esc(tl.pickWords.join(', '))}`:'쓰고 싶은 단어를 눌러 고르세요.'}</div>`
- +`<div class="randRow"><span class="randLabel">무작위</span>${[2,3,4,5].map(k=>`<button type="button" class="fchip${tl.randN===k?' on':''}" data-act="rand-n" data-v="${k}">${k}개</button>`).join('')}<button type="button" class="tbtn" data-act="pick-random">뽑기</button></div>`
+ +`<div class="randRow"><span class="randLabel">무작위</span>${[2,3,4,5].map(k=>`<button type="button" class="fchip${tl.randN===k?' on':''}" data-act="rand-n" data-v="${k}">${k}개</button>`).join('')}<button type="button" class="tbtn" data-act="pick-random">선택</button></div>`
  +`<div class="toolBtns"><button type="button" class="tbtn" data-act="pick-clear" ${n?'':'disabled'}>선택 해제</button><button type="button" class="tbtn primary" data-act="pick-sentence" ${n?'':'disabled'}>문장으로 쓰기</button><button type="button" class="tbtn primary" data-act="pick-paragraph" ${n?'':'disabled'}>문단으로 쓰기</button></div>`;
 }
 function renderTools(){
@@ -989,6 +989,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-25');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-26');
 </script>
 </body></html>
