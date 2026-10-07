@@ -123,14 +123,14 @@ html,body{background:#eadfd5}
 .card:nth-of-type(3){background:#eadccf}
 input,textarea{background:#fffaf4;border-color:#cdb29d;color:#3b271d}
 input::placeholder,textarea::placeholder{color:#ab9283}
-.record{background:#f4e8dc}#todaySentences .record{background:#f8efe6}
+.record{background:#f4e8dc}#todaySentences .record{background:#f4ebe5}
 .chip,.wordRecord{background:#dcc3ae;color:#3b271d}
 .plus{background:#5a3a2b}
 .bottom{background:rgba(248,240,231,.97);border-top-color:#cdb29d}
 .tab{color:#8c5f47}.tab.active{color:#3b271d}
 .del,.editBtn,.favBtn,.copyBtn,.recAct .favBtn,.recAct .copyBtn{color:#8c5f47}.recAct .favBtn.on{color:#b9732f}
 .archiveDay,.settingCard,.stat{background:rgba(255,250,244,.78);border-color:#e0cfc0}
-.archiveGroup.gW{background:#e8d6c7}.archiveGroup.gS{background:#eddccf;box-shadow:none}.archiveGroup.gS .record{background:#f8efe6}.archiveGroup.gP{background:#eadccf}
+.archiveGroup.gW{background:#e8d6c7}.archiveGroup.gS{background:#eddccf;box-shadow:none}.archiveGroup.gS .record{background:#f4ebe5}.archiveGroup.gP{background:#eadccf}
 .monthHead{background:#e8d6c7;color:#3b271d}.monthHead small{color:#8c5f47}.monthHead .arrow{color:#5a3a2b}
 .fchip{background:#e8d6c7;color:#5a3a2b}.fchip.on{background:#5a3a2b;color:#fff}
 .pager button{background:#eadccf;color:#3b271d}.pager button.on{background:#5a3a2b;color:#fff}
@@ -751,6 +751,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-14');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-15');
 </script>
 </body></html>
