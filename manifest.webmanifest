@@ -1,7 +1,7 @@
 {
   "name": "여백",
   "short_name": "여백",
-  "start_url": "./?v=7-19",
+  "start_url": "./?v=7-20",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f3e9de",
