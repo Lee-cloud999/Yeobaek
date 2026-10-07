@@ -145,6 +145,10 @@ mark{background:#efd29c}
 .record{font-size:15.5px;line-height:1.6;padding:12px 12px;border-radius:12px}
 .recordText{padding-top:1px}
 
+/* 글감 배너 */
+.seedBanner{position:fixed;z-index:25;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);transform:translateX(-50%);width:min(calc(100% - 24px),456px);display:flex;align-items:flex-start;gap:8px;background:rgba(90,58,43,.96);color:#fff;border-radius:16px;padding:9px 8px 9px 14px;box-shadow:0 6px 20px rgba(59,39,29,.28)}
+.seedBanner[hidden]{display:none}.seedBody{flex:1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}.seedLabel{font-size:11.5px;opacity:.8;margin-right:2px}.seedChip{background:rgba(255,255,255,.18);border-radius:99px;padding:3px 11px;font-size:14px;line-height:1.4}
+#seedClose{flex:none;width:30px;height:30px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:18px;line-height:1;padding:0}
 /* v7.20 활용 탭 */
 .bottom{grid-template-columns:repeat(5,1fr)}
 .toolCard{background:rgba(255,250,244,.78);border:1px solid #e0cfc0;border-radius:15px;padding:14px;margin-bottom:12px}
@@ -223,7 +227,7 @@ mark{background:#efd29c}
 <div class="settingsNote"><a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
-<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
+<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="seedBanner" id="seedBanner" hidden role="status"><div class="seedBody"></div><button type="button" id="seedClose" aria-label="글감 닫기">×</button></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
@@ -245,7 +249,7 @@ const db = getFirestore(app);
 const $ = s => document.querySelector(s);
 const weekdays = ['일','월','화','수','목','금','토'];
 let current = new Date();
-let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''},toolItems=null;
+let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''},toolItems=null;
 let archiveQuery='',closedMonths=new Set(),editing=null,archiveFilter='all',archivePage=1;const PAGE_DAYS=10;
 let daysCol = null, legacyRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
 const dirtyDates = new Set();
@@ -867,15 +871,28 @@ function drawCard(){
  c.font=`26px ${CARD_FONT}`;c.fillText(dt,W/2,fy+42);
 }
 function cardBlob(){return new Promise(async res=>{try{if(document.fonts&&document.fonts.ready)await document.fonts.ready}catch{}drawCard();$('#cardCanvas').toBlob(b=>res(b),'image/png')})}
+function updateSeed(){
+ const b=$('#seedBanner');if(!b)return;
+ const on=!!tl.seed&&$('#writeView').classList.contains('active');
+ b.hidden=!on;
+ if(on)b.querySelector('.seedBody').innerHTML='<span class="seedLabel">'+(tl.seed.type==='sentences'?'문장':'문단')+' 글감</span>'+tl.seed.words.map(w=>`<span class="seedChip">${esc(w)}</span>`).join('');
+}
+function clearSeed(){
+ tl.seed=null;$('#sentence').placeholder=DEF_PH.sentence;$('#paragraph').placeholder=DEF_PH.paragraph;updateSeed();
+}
 function startWriting(type,words){
  if(!words.length)return;
+ tl.seed={type,words:[...words]};
+ $('#sentence').placeholder=DEF_PH.sentence;$('#paragraph').placeholder=DEF_PH.paragraph;
  switchView('write');
  const el=$(type==='sentences'?'#sentence':'#paragraph');
  el.placeholder='글감: '+words.join(', ')+' — 이 단어로 써보세요.';
- el.focus();toast('글감을 정했어요.');
+ el.focus();
 }
-$('#addSentence').addEventListener('click',()=>{$('#sentence').placeholder=DEF_PH.sentence});
-$('#addParagraph').addEventListener('click',()=>{$('#paragraph').placeholder=DEF_PH.paragraph});
+$('#seedClose').addEventListener('click',clearSeed);
+// 기록을 실제로 저장할 때(입력 내용이 있을 때)만 글감을 내린다. 저장 처리보다 먼저 실행되도록 캡처 단계에서 확인.
+$('#addSentence').addEventListener('click',()=>{if($('#sentence').value.trim()&&tl.seed&&tl.seed.type==='sentences')setTimeout(clearSeed,0)},true);
+$('#addParagraph').addEventListener('click',()=>{if($('#paragraph').value.trim()&&tl.seed&&tl.seed.type==='paragraphs')setTimeout(clearSeed,0)},true);
 function syncMix(){
  tl.mixText=tl.mixSel.map(id=>(toolItems.byId.get(id)||{}).text||'').filter(Boolean).map(s=>s.trim()).join(' ');
  const ta=$('#mixText');if(ta)ta.value=tl.mixText;
@@ -921,7 +938,7 @@ function switchView(n,remember=true){
  const ids={write:'writeView',archive:'archiveView',tools:'toolsView',stats:'statsView',settings:'settingsView'};if(!ids[n])n='write';
  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('#'+ids[n]).classList.add('active');
  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===n));
- if(remember)sessionStorage.setItem('yeobaek:activeView',n);if(n==='archive')renderArchive();if(n==='stats')renderStats();if(n==='tools')renderTools();window.scrollTo({top:0,behavior:'auto'});
+ if(remember)sessionStorage.setItem('yeobaek:activeView',n);if(n==='archive')renderArchive();if(n==='stats')renderStats();if(n==='tools')renderTools();updateSeed();window.scrollTo({top:0,behavior:'auto'});
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
 
@@ -969,6 +986,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-22');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-23');
 </script>
 </body></html>
