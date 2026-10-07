@@ -139,6 +139,11 @@ input::placeholder,textarea::placeholder{color:#ab9283}
 .toast{background:#5a3a2b}.pullRefresh{background:rgba(90,58,43,.93)}
 .editBtns .save{background:#5a3a2b;color:#fff}.editBtns button{background:#e3cfbf;color:#3b271d}
 mark{background:#efd29c}
+/* v7.19 저장된 단어·문장·문단 크기 키움 */
+.chip{font-size:13.5px;line-height:20px;padding:5px 12px;gap:5px}
+.wordRecord{font-size:14px;line-height:20px;padding:6px 9px 6px 13px;gap:5px}
+.record{font-size:15.5px;line-height:1.6;padding:12px 12px;border-radius:12px}
+.recordText{padding-top:1px}
 </style>
 </head>
 <body><div class="app">
@@ -751,6 +756,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-18');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-19');
 </script>
 </body></html>
