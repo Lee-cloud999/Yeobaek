@@ -227,9 +227,16 @@ html.dark .backupNote{background:rgba(52,37,30,.85);border-color:#4a3329}html.da
 .bars .b i{display:block;width:100%;max-width:30px;background:#c9a98f;border-radius:5px 5px 2px 2px;min-height:2px}.bars .b em{font-style:normal;margin-top:4px}.bars .b u{text-decoration:none;font-size:10px;margin-bottom:2px}
 .topWords{display:flex;flex-wrap:wrap;gap:6px}.topWords span{background:#dcc3ae;border-radius:999px;padding:5px 11px;font-size:13px}.topWords small{color:var(--muted);margin-left:4px;font-size:11px}
 html.dark .statBox{background:rgba(52,37,30,.85);border-color:#4a3329}html.dark .bars .b i{background:#c99a78}html.dark .topWords span{background:#46332a}
+.onb{position:fixed;inset:0;z-index:90;background:rgba(40,25,18,.55);display:flex;align-items:center;justify-content:center;padding:24px}
+.onb[hidden]{display:none}.onbCard{position:relative;width:100%;max-width:340px;min-height:250px;background:#f8f0e7;border-radius:22px;padding:44px 26px 22px;text-align:center;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(40,25,18,.3)}
+.onbSkip{position:absolute;top:14px;right:16px;border:0;background:none;color:#8c5f47;font-size:13px;cursor:pointer;padding:6px}
+.onbText{flex:1;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1.6;color:#3b271d;cursor:pointer;word-break:keep-all}
+.onbDots{display:flex;gap:7px;justify-content:center;margin:16px 0}.onbDots i{width:7px;height:7px;border-radius:50%;background:#dcc3ae}.onbDots i.on{background:#5a3a2b}
+.onbBtns{display:flex;gap:8px;justify-content:center}.onbBtns .softBtn{min-width:96px}
+html.dark .onbCard{background:#2b1e18}html.dark .onbText{color:#f0e1d3}html.dark .onbSkip{color:#c99a78}html.dark .onbDots i{background:#4a3329}html.dark .onbDots i.on{background:#c99a78}
 </style>
 </head>
-<body><div class="app">
+<body><div id="onb" class="onb" hidden><div class="onbCard"><button class="onbSkip" id="onbSkip" type="button">건너뛰기</button><div class="onbText" id="onbText"></div><div class="onbDots" id="onbDots"></div><div class="onbBtns" id="onbBtns"></div></div></div><div class="app">
 <header class="top"><div><div class="brand">여백</div><div class="intro">스쳐가는 생각을<br>남겨보세요.</div></div><div class="datebox"><div class="daterow"><button class="navbtn" id="prev">‹</button><div class="date" id="date">오늘</div><button class="navbtn" id="next">›</button></div><div class="quote" id="quote">쓰는 마음이,<br>조금은 가벼워지기를.</div></div></header>
 <main id="writeView" class="view active">
 <div id="recall" class="recall"></div>
@@ -1165,7 +1172,34 @@ function repairExistingLocalData(){
 repairExistingLocalData();
 
 renderAll();
+
+// ===== 처음 열었을 때 안내 (3장) =====
+(function(){
+  let seen='';try{seen=localStorage.getItem('yeobaek-onboarded')||''}catch{}
+  if(seen)return;
+  let has=false;for(let i=0;i<localStorage.length;i++){if(/^yeobaek:\d{4}-/.test(localStorage.key(i)||'')){has=true;break}}
+  const done=()=>{try{localStorage.setItem('yeobaek-onboarded','1')}catch{}};
+  if(has){done();return}
+  const ios=/iP(hone|ad|od)/.test(navigator.userAgent)&&!navigator.standalone&&!matchMedia('(display-mode: standalone)').matches;
+  const pages=['스쳐가는 단어 하나면 충분해요.','기록은 이 기기에 저장돼요.','로그인하면 기기를 바꿔도 이어 쓸 수 있어요.'];
+  if(ios)pages.push('공유 버튼에서 "홈 화면에 추가"를 누르면 앱처럼 열려요.');
+  const box=$('#onb');let n=0;
+  const close=()=>{box.hidden=true;done()};
+  function draw(){
+    $('#onbText').textContent=pages[n];
+    $('#onbDots').innerHTML=pages.map((_,i)=>'<i class="'+(i===n?'on':'')+'"></i>').join('');
+    const last=n===pages.length-1;
+    $('#onbBtns').innerHTML=last?'<button class="softBtn" id="onbLater" type="button">나중에</button><button class="softBtn primaryBtn" id="onbLogin" type="button">로그인하기</button>':'<button class="softBtn primaryBtn" id="onbNext" type="button">다음</button>';
+    const g=id=>document.getElementById(id);
+    if(g('onbNext'))g('onbNext').onclick=()=>{n++;draw()};
+    if(g('onbLater'))g('onbLater').onclick=close;
+    if(g('onbLogin'))g('onbLogin').onclick=()=>{close();switchView('settings')};
+  }
+  $('#onbText').addEventListener('click',()=>{if(n<pages.length-1){n++;draw()}});
+  $('#onbSkip').addEventListener('click',close);
+  draw();box.hidden=false;
+})();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-34');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-35');
 </script>
 </body></html>
