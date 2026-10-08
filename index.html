@@ -164,7 +164,7 @@ mark{background:#efd29c}
 .toolEmpty{font-size:13px;line-height:1.6;color:#8c5f47;padding:8px 2px}
 .pickChips{display:flex;flex-wrap:wrap;gap:7px}.pickChip{border:0;border-radius:99px;padding:6px 13px;font-family:inherit;font-size:14px;background:#eadccf;color:#3b271d}.pickChip.on{background:#5a3a2b;color:#fff}.pickChip small{opacity:.65;font-size:11px}.sortRow{margin:0 0 10px}.moreRow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}.randRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}.randLabel{font-size:12.5px;color:#6b4636;margin-right:2px}
 .mixInfo{font-size:12px;color:#6b4636;margin:10px 2px 0}
-.pickList{max-height:260px;overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.toolFold{width:100%;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}.toolFold[aria-expanded=false]{margin-bottom:0}.toolFold[aria-expanded=true]{margin-bottom:10px}.pickList{max-height:260px;overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
 .pickRow{display:flex;gap:9px;align-items:flex-start;text-align:left;border:0;border-radius:11px;background:#f4e8dc;color:#3b271d;padding:9px 10px;font-family:inherit}.pickRow.on{background:#dcc3ae}
 .pickNo{flex:none;min-width:26px;height:22px;border-radius:99px;background:rgba(90,58,43,.12);color:#5a3a2b;font:bold 11px/22px Arial,sans-serif;text-align:center;padding:0 5px}.pickRow.on .pickNo{background:#5a3a2b;color:#fff}
 .pickBody{display:flex;flex-direction:column;gap:2px;min-width:0}.pickText{font-size:14px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}.pickDate{font-size:11px;color:#8c5f47}
@@ -350,7 +350,7 @@ const $ = s => document.querySelector(s);
 const weekdays = ['일','월','화','수','목','금','토'];
 let current = new Date();
 let toastTimer=null;
-let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixPage:1,mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''},toolItems=null;
+let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixPage:1,mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:'',cardOpen:false},toolItems=null;
 let archiveQuery='',closedMonths=new Set(),editing=null,archiveFilter='all',archivePage=1;const PAGE_DAYS=10;
 let daysCol = null, legacyRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
 const dirtyDates = new Set();
@@ -700,7 +700,7 @@ function swapScope(desired,drop=false){
 }
 function resetViewState(){
   // 다른 계정(또는 로그인 전 화면)의 글이 화면 상태에 남아 보이지 않도록 지운다.
-  tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixPage:1,mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''};toolItems=null;
+  tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixPage:1,mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:'',cardOpen:false};toolItems=null;
   archiveQuery='';archivePage=1;editing=null;closedMonths=new Set();
   const q=$('#archiveSearch');if(q){q.value='';const c=$('#archiveSearchClear');if(c)c.hidden=true}
   $('#word').value='';
@@ -1098,13 +1098,13 @@ function renderTools(){
   +`<input id="mixQ" type="search" autocomplete="off" placeholder="문장 검색" aria-label="문장 검색" value="${esc(tl.mixQ)}"><div id="mixList" class="pickList">${mixListHTML()}</div><div id="mixPager" class="pager">${mixPagerHTML()}</div>`
   +`<div class="mixInfo" id="mixInfo">선택한 문장 ${tl.mixSel.length}개</div><textarea id="mixText" class="toolText" placeholder="고른 문장이 여기에 이어져요. 직접 고쳐도 돼요." aria-label="문단 초안">${esc(tl.mixText)}</textarea>`
   +`<div class="toolBtns"><button type="button" class="tbtn" data-act="mix-clear">비우기</button><button type="button" class="tbtn" data-act="mix-edit">쓰기 화면에서 다듬기</button><button type="button" class="tbtn primary" data-act="mix-save">문단으로 저장</button></div></div>`;
- h+=`<div class="toolCard" id="cardSection"><div class="toolHead"><h3>문장 카드 이미지</h3><span class="toolSub">저장하거나 공유해요</span></div>`
-  +`<textarea id="cardText" class="toolText" placeholder="카드에 담을 문장을 쓰거나, 아래에서 기록을 골라보세요." aria-label="카드 문장">${esc(tl.cardText)}</textarea>`
+ h+=`<div class="toolCard" id="cardSection"><button type="button" class="toolHead toolFold" data-act="card-toggle" aria-expanded="${tl.cardOpen}"><h3>문장 카드 이미지</h3><span class="toolSub">${tl.cardOpen?'접기 ▴':'열기 ▾'}</span></button>`
+  +(tl.cardOpen?`<textarea id="cardText" class="toolText" placeholder="카드에 담을 문장을 쓰거나, 아래에서 기록을 골라보세요." aria-label="카드 문장">${esc(tl.cardText)}</textarea>`
   +`<div class="chipRow" id="cardThemes">${Object.entries(CARD_THEMES).map(([k,t])=>`<button type="button" class="fchip${tl.cardTheme===k?' on':''}" data-act="card-theme" data-v="${k}">${t.n}</button>`).join('')}</div>`
   +`<div class="chipRow" id="cardRatios">${Object.entries(CARD_RATIO).map(([k,t])=>`<button type="button" class="fchip${tl.cardRatio===k?' on':''}" data-act="card-ratio" data-v="${k}">${t.n}</button>`).join('')}</div>`
   +`<div class="cardWrap"><canvas id="cardCanvas" aria-label="문장 카드 미리보기"></canvas></div>`
   +`<div class="toolBtns"><button type="button" class="tbtn primary" data-act="card-save">이미지 저장</button>${typeof navigator.canShare==='function'?'<button type="button" class="tbtn" data-act="card-share">공유</button>':''}</div>`
-  +`<div class="toolSub" style="margin:12px 2px 6px">기록에서 고르기</div><input id="cardQ" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색" value="${esc(tl.cardQ)}"><div id="cardList" class="pickList">${cardListHTML()}</div></div>`;
+  +`<div class="toolSub" style="margin:12px 2px 6px">기록에서 고르기</div><input id="cardQ" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색" value="${esc(tl.cardQ)}"><div id="cardList" class="pickList">${cardListHTML()}</div>`:'')+`</div>`;
  box.innerHTML=h;
  drawCard();
 }
@@ -1183,7 +1183,8 @@ document.addEventListener('click',async e=>{
  const a=b.dataset.act;
  if(a==='piece-next'){pickPiece(true);renderTools()}
  else if(a==='piece-copy'){if(tl.piece)copyText(tl.piece.text).then(ok=>toast(ok?'복사했어요.':'복사하지 못했어요.'))}
- else if(a==='piece-card'){if(tl.piece){tl.cardText=tl.piece.text;tl.cardDate=tl.piece.date;renderTools();$('#cardSection').scrollIntoView({behavior:'smooth',block:'start'})}}
+ else if(a==='piece-card'){if(tl.piece){tl.cardText=tl.piece.text;tl.cardDate=tl.piece.date;tl.cardOpen=true;renderTools();$('#cardSection').scrollIntoView({behavior:'smooth',block:'start'})}}
+ else if(a==='card-toggle'){tl.cardOpen=!tl.cardOpen;renderTools();if(tl.cardOpen)$('#cardSection').scrollIntoView({behavior:'smooth',block:'start'})}
  else if(a==='word-next'){pickWord(true);renderTools()}
  else if(a==='word-write'){if(tl.word)startWriting('sentences',[tl.word.text])}
  else if(a==='pick-toggle'){const w=b.dataset.w,k=tl.pickWords.indexOf(w);k>=0?tl.pickWords.splice(k,1):tl.pickWords.push(w);$('#pickBox').innerHTML=pickBoxHTML()}

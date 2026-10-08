@@ -1,4 +1,4 @@
-const CACHE='yeobaek-v7-51-icon-20261008';
+const CACHE='yeobaek-v7-52-fold-20261008';
 // 외부 자원(Firebase 코드, 서체)은 버전이 올라도 지우지 않고 따로 보관한다.
 const EXT='yeobaek-ext-v1';
 const APP=['./?v=7-50','./index.html?v=7-50','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
