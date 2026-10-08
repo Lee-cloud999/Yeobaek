@@ -1,7 +1,15 @@
 {
+  "id": "./",
   "name": "여백",
   "short_name": "여백",
-  "start_url": "./?v=7-49",
+  "description": "스쳐가는 생각을 단어, 문장, 문단으로 가볍게 남기는 조용한 기록 앱",
+  "lang": "ko",
+  "dir": "ltr",
+  "categories": [
+    "lifestyle",
+    "productivity"
+  ],
+  "start_url": "./?v=7-50",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f3e9de",
@@ -11,7 +19,7 @@
       "src": "./icon.svg?v=4",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./icon-192.png?v=4",
@@ -24,6 +32,35 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/shot-1.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "쓰기"
+    },
+    {
+      "src": "./screenshots/shot-2.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "활용"
+    },
+    {
+      "src": "./screenshots/shot-3.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "모아보기"
     }
   ]
 }
