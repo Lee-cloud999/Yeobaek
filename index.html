@@ -136,7 +136,8 @@ input::placeholder,textarea::placeholder{color:#ab9283}
 .pager button{background:#eadccf;color:#3b271d}.pager button.on{background:#5a3a2b;color:#fff}
 .recallItem{border-left-color:#b78f74;background:rgba(255,250,244,.7)}.recallText{color:#3b271d}
 .searchClear{color:#8c5f47}.archiveInfo{color:#6b4636}
-.toast{background:#5a3a2b}.pullRefresh{background:rgba(90,58,43,.93)}
+.toast{background:#5a3a2b}.toast.act{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;font-size:12.5px}.toastBtn{border:0;border-radius:99px;background:rgba(232,211,191,.2);color:#f3e1cf;font-family:inherit;font-size:12.5px;padding:5px 12px}
+.wordText{cursor:pointer}.wordEditing{padding:3px 5px 3px 6px!important;gap:3px}.wordEdit{width:8.5em;height:28px!important;padding:2px 9px!important;font-size:14px!important;border-radius:99px!important;margin:0}.wEditSave,.wEditCancel{width:26px;height:26px;border:0;border-radius:50%;background:rgba(90,58,43,.14);color:#3b271d;font-size:14px;line-height:1;padding:0}.wEditSave{background:#5a3a2b;color:#fff}.pullRefresh{background:rgba(90,58,43,.93)}
 .editBtns .save{background:#5a3a2b;color:#fff}.editBtns button{background:#e3cfbf;color:#3b271d}
 mark{background:#efd29c}
 /* v7.19 저장된 단어·문장·문단 크기 키움 */
@@ -268,6 +269,7 @@ const db = getFirestore(app);
 const $ = s => document.querySelector(s);
 const weekdays = ['일','월','화','수','목','금','토'];
 let current = new Date();
+let toastTimer=null;
 let tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixPage:1,mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''},toolItems=null;
 let archiveQuery='',closedMonths=new Set(),editing=null,archiveFilter='all',archivePage=1;const PAGE_DAYS=10;
 let daysCol = null, legacyRef = null, unsubscribeCloud = null, applyingCloud = false, uploadTimer = null;
@@ -328,7 +330,12 @@ function saveLocal(x,d=current,queue=true,delay=350){
   if(queue) scheduleCloudUpload(dateKey(d),delay);
 }
 function esc(s){const d=document.createElement('div');d.textContent=s??'';return d.innerHTML}
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),900)}
+function toast(t,ms=900){const e=$('#toast');e.classList.remove('act');e.textContent=t;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),ms)}
+function toastUndo(t,fn){
+ const e=$('#toast');e.innerHTML='<span></span><button type="button" class="toastBtn">되돌리기</button>';e.firstChild.textContent=t;e.classList.add('show','act');
+ e.querySelector('button').onclick=()=>{clearTimeout(toastTimer);e.classList.remove('show','act');fn()};
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show','act'),5000);
+}
 function deleteButton(date,type,index,ask){return `<button class="del delete-record" data-date="${date}" data-type="${type}" data-index="${index}" data-ask="${ask?'1':'0'}" aria-label="삭제">×</button>`}
 
 function collectLocalEntries(){
@@ -582,7 +589,7 @@ function render(){
  const x=loadByDate(),dk=dateKey(current);renderRecall();
  $('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];
  $('#wordCount').textContent='오늘 '+x.words.length+'개';
- $('#recent').innerHTML=x.words.map((w,i)=>`<span class="chip">${esc(w)} ${deleteButton(dk,'words',i,false)}</span>`).join('');
+ $('#recent').innerHTML=x.words.map((w,i)=>wordChipHTML(dk,w,i,'chip','')).join('');
  if(document.activeElement!==$('#sentence')) $('#sentence').value=x.draftSentence||'';
  if(document.activeElement!==$('#paragraph')) $('#paragraph').value=x.draftParagraph||'';
  $('#todaySentences').innerHTML=x.sentences.length?'<div class="todaySavedLabel">오늘 저장한 문장</div>'+x.sentences.map((v,i)=>recordHTML(dk,'sentences',v,i,'',isFav(x,'sentences',i))).join(''):'';
@@ -612,8 +619,12 @@ function deleteItem(date,type,index,ask=true){
  const k='yeobaek:'+date; let x;try{x=normalize(JSON.parse(localStorage.getItem(k)||'{}'),date)}catch{return}
  if(!x[type]||index<0||index>=x[type].length)return;
  const id=x._ids[type][index]; if(id)x._deleted.push(id);
+ const val=x[type][index],wasFav=!!id&&(x._fav[id]||0)>0;
  x[type].splice(index,1);x._ids[type].splice(index,1);
- localStorage.setItem(k,JSON.stringify(x));scheduleCloudUpload(date);renderAll();toast('삭제했어요.');
+ localStorage.setItem(k,JSON.stringify(x));scheduleCloudUpload(date);renderAll();
+ // 되돌리기: 이미 삭제 표시(tombstone)가 동기화됐을 수 있으므로 같은 자리에 "새 ID"로 다시 넣는다.
+ const undo=()=>{const y=loadEntryByDate(date),at=Math.min(index,y[type].length),nid=uid();y[type].splice(at,0,val);y._ids[type].splice(at,0,nid);if(wasFav)y._fav[nid]=Date.now();localStorage.setItem('yeobaek:'+date,JSON.stringify(y));scheduleCloudUpload(date);renderAll();toast('되돌렸어요.')};
+ if(typeof toastUndo==='function')toastUndo('삭제했어요.',undo);else toast('삭제했어요.');
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.delete-record');if(b)deleteItem(b.dataset.date,b.dataset.type,Number(b.dataset.index),b.dataset.ask==='1')});
 
@@ -625,6 +636,11 @@ function hl(text,q){
  return out+esc(text.slice(pos));
 }
 const isFav=(x,type,i)=>{const id=(x._ids[type]||[])[i];return !!id&&(x._fav[id]||0)>0};
+function wordChipHTML(date,w,i,cls,q){
+ if(editing&&editing.date===date&&editing.type==='words'&&editing.index===i)
+  return `<span class="${cls} wordEditing"><input class="wordEdit" value="${esc(editing.text)}" aria-label="단어 수정" maxlength="40" autocomplete="off"><button type="button" class="wEditSave" aria-label="저장">✓</button><button type="button" class="wEditCancel" aria-label="취소">×</button></span>`;
+ return `<span class="${cls}"><span class="wordText word-edit" data-date="${date}" data-index="${i}" role="button" tabindex="0" title="눌러서 수정">${hl(w,q||'')}</span> ${deleteButton(date,'words',i,false)}</span>`;
+}
 function recordHTML(date,type,v,i,q,fav){
  if(editing&&editing.date===date&&editing.type===type&&editing.index===i){
   return `<div class="record"><div class="editBox"><textarea class="editArea" aria-label="기록 수정">${esc(editing.text)}</textarea><div class="editBtns"><button type="button" class="edit-cancel">취소</button><button type="button" class="save edit-save">저장</button></div></div></div>`;
@@ -646,7 +662,7 @@ function renderArchive(){
   const n=ws.length+ss.length+ps.length;
   if(!n)continue;
   matches+=n;
-  const w=ws.length?'<div class="archiveGroup gW"><div class="archiveLabel">WORD</div>'+ws.map(([v,i])=>`<span class="wordRecord">${hl(v,q)}${deleteButton(date,'words',i,false)}</span>`).join('')+'</div>':'';
+  const w=ws.length?'<div class="archiveGroup gW"><div class="archiveLabel">WORD</div>'+ws.map(([v,i])=>wordChipHTML(date,v,i,'wordRecord',q)).join('')+'</div>':'';
   const s=ss.length?'<div class="archiveGroup gS"><div class="archiveLabel">SENTENCE</div>'+ss.map(([v,i])=>recordHTML(date,'sentences',v,i,q,isFav(d,'sentences',i))).join('')+'</div>':'';
   const p=ps.length?'<div class="archiveGroup gP"><div class="archiveLabel">PARAGRAPH</div>'+ps.map(([v,i])=>recordHTML(date,'paragraphs',v,i,q,isFav(d,'paragraphs',i))).join('')+'</div>':'';
   days.push({date,n,html:`<div class="archiveDay"><div class="archiveDate">${prettyDate(date)}</div>${w+s+p}</div>`});
@@ -686,12 +702,21 @@ document.addEventListener('click',e=>{
  if(fb){toggleFav(fb.dataset.date,fb.dataset.type,Number(fb.dataset.index));return}
  const cb=t.closest('.copy-record');
  if(cb){const x=loadEntryByDate(cb.dataset.date);const v=(x[cb.dataset.type]||[])[Number(cb.dataset.index)];if(v!=null)copyText(v).then(ok=>toast(ok?'복사했어요.':'복사하지 못했어요.'));return}
+ const we=t.closest('.word-edit');
+ if(we){const date=we.dataset.date,index=Number(we.dataset.index),x=loadEntryByDate(date);editing={date,type:'words',index,text:x.words[index]??''};renderAll();const inp=[...document.querySelectorAll('.wordEdit')].find(a=>a.offsetParent);if(inp){inp.focus();inp.select()}return}
+ if(t.closest('.wEditSave')){const inp=t.closest('.wordEditing').querySelector('.wordEdit');if(editing)editItem(editing.date,'words',editing.index,inp.value);return}
+ if(t.closest('.wEditCancel')){editing=null;renderAll();return}
  const eb=t.closest('.edit-record');
  if(eb){const date=eb.dataset.date,type=eb.dataset.type,index=Number(eb.dataset.index);const x=loadEntryByDate(date);editing={date,type,index,text:(x[type]||[])[index]??''};renderAll();const ta=[...document.querySelectorAll('.editArea')].find(a=>a.offsetParent);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}return}
  if(t.closest('.edit-cancel')){editing=null;renderAll();return}
  if(t.closest('.edit-save')){const ta=t.closest('.editBox').querySelector('.editArea');if(ta&&editing)editItem(editing.date,editing.type,editing.index,ta.value);return}
 });
-document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('editArea')&&editing)editing.text=e.target.value});
+document.addEventListener('input',e=>{const c=e.target.classList;if(c&&(c.contains('editArea')||c.contains('wordEdit'))&&editing)editing.text=e.target.value});
+document.addEventListener('keydown',e=>{
+ const t=e.target;if(!t.classList)return;
+ if(t.classList.contains('wordEdit')){if(e.key==='Enter'){e.preventDefault();if(editing)editItem(editing.date,'words',editing.index,t.value)}else if(e.key==='Escape'){editing=null;renderAll()}}
+ else if(t.classList.contains('word-edit')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();t.click()}
+});
 function loadEntryByDate(date){try{return normalize(JSON.parse(localStorage.getItem('yeobaek:'+date)||'{}'),date)}catch{return blank()}}
 function toggleFav(date,type,index){
  const x=loadEntryByDate(date),id=(x._ids[type]||[])[index];if(!id)return;
@@ -1024,6 +1049,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-29');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-30');
 </script>
 </body></html>
