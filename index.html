@@ -236,6 +236,7 @@ html.dark .statBox{background:rgba(52,37,30,.85);border-color:#4a3329}html.dark 
 html.dark .onbCard{background:#2b1e18}html.dark .onbText{color:#e6cdb2}html.dark .onbSkip{color:#c99a78}html.dark .onbDots i{background:#4a3329}html.dark .onbDots i.on{background:#c99a78}
 html.dark .toast,html.dark .pullRefresh{color:#e6cdb2}html.dark .plus{color:#2b1e18}
 .tab b .gear{display:block;margin:0 auto}
+html.dark{--bgi:#241915}
 </style>
 </head>
 <body><div id="onb" class="onb" hidden><div class="onbCard"><button class="onbSkip" id="onbSkip" type="button">건너뛰기</button><div class="onbText" id="onbText"></div><div class="onbDots" id="onbDots"></div><div class="onbBtns" id="onbBtns"></div></div></div><div class="app">
@@ -250,7 +251,7 @@ html.dark .toast,html.dark .pullRefresh{color:#e6cdb2}html.dark .plus{color:#2b1
 <section id="toolsView" class="view subview"><div class="pagehead"><h2>활용</h2><p>모아 둔 기록을 다시 꺼내 쓰고, 이어 붙이고, 카드로 만들어요.</p></div><div id="toolsBody"></div></section>
 <section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div><div id="statsExtra"></div></section>
 <section id="settingsView" class="view subview">
-<div class="subHeader"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관하세요.</p></div>
+<div class="pagehead"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관해요.</p></div>
 
 <div class="settingsCard">
   <div class="settingRow">
@@ -301,7 +302,7 @@ html.dark .toast,html.dark .pullRefresh{color:#e6cdb2}html.dark .plus{color:#2b1
 <div class="settingsNote"><a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
-<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b><svg class="gear" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><circle cx="12" cy="12" r="6.6"/><line x1="19.20" y1="12.00" x2="21.80" y2="12.00"/><line x1="17.09" y1="17.09" x2="18.93" y2="18.93"/><line x1="12.00" y1="19.20" x2="12.00" y2="21.80"/><line x1="6.91" y1="17.09" x2="5.07" y2="18.93"/><line x1="4.80" y1="12.00" x2="2.20" y2="12.00"/><line x1="6.91" y1="6.91" x2="5.07" y2="5.07"/><line x1="12.00" y1="4.80" x2="12.00" y2="2.20"/><line x1="17.09" y1="6.91" x2="18.93" y2="5.07"/></svg></b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
+<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b><svg class="gear" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="16" cy="12" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="10" cy="18" r="2.4" fill="var(--bgi,#f8f0e7)"/></svg></b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
 
 <script type="module">
 // v7.29: Firebase는 동적으로 불러온다. 오프라인이거나 불러오기에 실패해도 기록·활용 기능은 그대로 동작하고(이 기기에만 저장),
@@ -1202,6 +1203,6 @@ renderAll();
   draw();box.hidden=false;
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-37');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-38');
 </script>
 </body></html>
