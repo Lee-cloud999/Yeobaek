@@ -243,7 +243,7 @@ html.dark{--bgi:#241915}
 html.dark .settingsCard{background:rgba(52,37,30,.85);border-color:#4a3329}
 </style>
 </head>
-<body><div id="onb" class="onb" hidden><div class="onbCard"><button class="onbSkip" id="onbSkip" type="button">건너뛰기</button><div class="onbText" id="onbText"></div><div class="onbDots" id="onbDots"></div><div class="onbBtns" id="onbBtns"></div></div></div><div class="app">
+<body><div id="ask" class="onb" hidden style="z-index:95"><div class="onbCard" style="min-height:0"><div class="onbText" id="askText" style="font-size:17px;cursor:default;white-space:pre-line;padding:6px 0 18px"></div><div class="onbBtns" id="askBtns" style="flex-wrap:wrap"></div></div></div><div id="onb" class="onb" hidden><div class="onbCard"><button class="onbSkip" id="onbSkip" type="button">건너뛰기</button><div class="onbText" id="onbText"></div><div class="onbDots" id="onbDots"></div><div class="onbBtns" id="onbBtns"></div></div></div><div class="app">
 <header class="top"><div><div class="brand">여백</div><div class="intro">스쳐가는 생각을<br>남겨보세요.</div></div><div class="datebox"><div class="daterow"><button class="navbtn" id="prev">‹</button><div class="date" id="date">오늘</div><button class="navbtn" id="next">›</button></div><div class="quote" id="quote">쓰는 마음이,<br>조금은 가벼워지기를.</div></div></header>
 <main id="writeView" class="view active">
 <div id="recall" class="recall"></div>
@@ -299,13 +299,13 @@ html.dark .settingsCard{background:rgba(52,37,30,.85);border-color:#4a3329}
   </div>
   <div class="deleteBox" id="deleteBox" hidden>
     <input id="deletePassword" type="password" autocomplete="current-password" placeholder="비밀번호를 다시 입력해주세요">
-    <label class="checkRow"><input id="deleteLocalToo" type="checkbox"> 이 기기에 저장된 기록도 함께 삭제</label>
+    <p class="settingsNote" style="margin:6px 0">계정의 기록은 이 기기에서도 함께 삭제돼요. 로그인하기 전에 쓴 기록은 그대로 남아요.</p>
     <div class="deleteBtns"><button class="softBtn" id="deleteCancelBtn" type="button">취소</button><button class="softBtn dangerBtn" id="deleteConfirmBtn" type="button">영구 삭제</button></div>
   </div>
 </div>
 <div class="settingsNote"><button class="linkBtn" id="replayTutorial" type="button">튜토리얼 다시보기</button> · <a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
 <div class="settingsNote">이 앱에는 네이버에서 제공한 마루부리 글꼴을 기반으로 형식을 변환하고 일부 글자를 제외한 수정본 ‘Yeobaek Serif’가 적용되어 있습니다. · <a href="./fonts/LICENSE-MaruBuri-OFL.txt" target="_blank" rel="noopener">글꼴 라이선스</a></div>
-<div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
+<div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 계정의 기록이 따로 보이고, 로그인 전에 쓴 기록은 원하면 계정으로 가져올 수 있어요. 로그아웃하면 로그인 전 기록 화면으로 돌아와요.</div>
 </section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b><svg class="gear" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="16" cy="12" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="10" cy="18" r="2.4" fill="var(--bgi,#f8f0e7)"/></svg></b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
 
@@ -549,7 +549,8 @@ async function syncNow(silent=false){
      catch(e){console.warn('migration flag',e)}
    }
    if(ok)setSyncStatus('동기화 완료','ok');
- }catch(e){console.error(e);setSyncStatus('동기화 실패','error');if(!silent)alert('동기화하지 못했어요.\n\n오류 코드: '+(e?.code||'unknown'))}
+   return !!ok;
+ }catch(e){console.error(e);setSyncStatus('동기화 실패','error');if(!silent)alert('동기화하지 못했어요.\n\n오류 코드: '+(e?.code||'unknown'));return false}
 }
 function startRealtime(user){
  if(unsubscribeCloud)unsubscribeCloud();
@@ -625,7 +626,7 @@ let deletingAccount=false;
 function openDeleteBox(){$('#deleteBox').hidden=false;$('#deleteOpenBtn').hidden=true;$('#deletePassword').focus()}
 function closeDeleteBox(){
  $('#deleteBox').hidden=true;$('#deleteOpenBtn').hidden=false;
- $('#deletePassword').value='';$('#deleteLocalToo').checked=false;
+ $('#deletePassword').value='';
 }
 async function deleteCloudData(user){
  const col=collection(db,'users',user.uid,'apps','yeobaek','days');
@@ -652,17 +653,16 @@ async function deleteAccount(){
  const btn=$('#deleteConfirmBtn');btn.disabled=true;
  try{
    await reauthenticateWithCredential(user,EmailAuthProvider.credential(user.email,pw));
-   deletingAccount=true;
+   deletingAccount=true;dropAccountLocal=true;
    clearTimeout(uploadTimer);dirtyDates.clear();
    if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null}
    await deleteCloudData(user);
    await deleteUser(user);
-   if($('#deleteLocalToo').checked)clearLocalEntries();
    deletingAccount=false;
    closeDeleteBox();toast('계정을 삭제했어요.');
  }catch(e){
    console.error('delete account',e);
-   deletingAccount=false;
+   deletingAccount=false;dropAccountLocal=false;
    alert('계정을 삭제하지 못했어요.\n\n'+authErr(e));
    if(auth.currentUser){await syncNow(true);startRealtime(auth.currentUser)}
  }finally{btn.disabled=false}
@@ -670,7 +670,60 @@ async function deleteAccount(){
 window.addEventListener('online',()=>{if(!fbLive){const typing=($('#sentence')?.value||$('#paragraph')?.value||$('#word')?.value||'').trim();if(!typing)location.reload();else toast('연결됐어요. 저장한 뒤 앱을 다시 열면 동기화돼요.');return}if(auth.currentUser){setSyncStatus('연결됨 · 동기화 중…');syncNow(true)}});
 window.addEventListener('offline',()=>setSyncStatus('오프라인 · 이 기기에 저장 중'));
 
+
+// ===== 계정별 기록 분리 (v7.45) =====
+// 화면과 코드는 언제나 'yeobaek:날짜' 칸을 쓰고, 계정이 바뀌면 그 칸의 내용을 계정별 보관함으로 맞바꾼다.
+// 'guest' = 로그인하지 않고 쓴 기록, 그 밖에는 계정 uid.
+const SCOPE_KEY='yeobaek-scope';
+let dropAccountLocal=false;
+const ENTRY_RE=/^yeobaek:\d{4}-\d{2}-\d{2}$/;
+function stashKeys(scope){const pre='yeobaekstash:'+scope+':',out=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(pre))out.push(k)}return out}
+function swapScope(desired,drop=false){
+  const cur=lsGet(SCOPE_KEY);
+  if(cur===desired)return false;
+  // 업데이트 직후 첫 실행: 지금 있는 기록은 지금 로그인한 계정(또는 게스트)의 것으로 본다.
+  if(cur===null){try{localStorage.setItem(SCOPE_KEY,desired)}catch{}return false}
+  const move=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&ENTRY_RE.test(k))move.push(k)}
+  move.forEach(k=>{if(!drop)localStorage.setItem('yeobaekstash:'+cur+':'+k.slice(8),localStorage.getItem(k));localStorage.removeItem(k)});
+  if(drop)stashKeys(cur).forEach(k=>localStorage.removeItem(k));
+  stashKeys(desired).forEach(k=>{localStorage.setItem('yeobaek:'+k.split(':').pop(),localStorage.getItem(k));localStorage.removeItem(k)});
+  try{localStorage.setItem(SCOPE_KEY,desired)}catch{}
+  return true;
+}
+function askChoice(text,labels){
+  return new Promise(res=>{
+    $('#askText').textContent=text;
+    $('#askBtns').innerHTML=labels.map((l,i)=>'<button type="button" class="softBtn'+(i===0?' primaryBtn':'')+'" data-i="'+i+'">'+l+'</button>').join('');
+    $('#ask').hidden=false;
+    $('#askBtns').onclick=e=>{const b=e.target.closest('button');if(!b)return;$('#ask').hidden=true;res(Number(b.dataset.i))};
+  });
+}
+async function offerGuestImport(){
+  const keys=stashKeys('guest');if(!keys.length)return;
+  let sig=keys.length+':';keys.forEach(k=>sig+=(localStorage.getItem(k)||'').length+',');
+  if(lsGet('yeobaek-guestDeclined')===sig)return;
+  const c=await askChoice('로그인하기 전에 이 기기에 쓴 기록이 '+keys.length+'일치 있어요.\n이 계정으로 가져올까요?\n\n가져오지 않으면 로그아웃했을 때 다시 볼 수 있어요.',['가져오기','가져오지 않기']);
+  if(c!==0){try{localStorage.setItem('yeobaek-guestDeclined',sig)}catch{}return}
+  const merged={};
+  keys.forEach(k=>{const d=k.split(':').pop();try{merged[d]=mergeEntry(loadLocalEntry(d),normalize(JSON.parse(localStorage.getItem(k)),d),d)}catch{}});
+  putLocalEntries(merged);keys.forEach(k=>localStorage.removeItem(k));
+  try{localStorage.removeItem('yeobaek-guestDeclined')}catch{}
+  renderAll();scheduleCloudUpload(Object.keys(merged),250);toast('기록을 가져왔어요.');
+}
+async function doLogout(){
+  const btn=$('#logoutBtn');btn.disabled=true;
+  try{
+    clearTimeout(uploadTimer);
+    const ok=await syncNow(true);
+    if(ok===true)dropAccountLocal=true;
+    else if(!confirm('동기화하지 못한 기록이 있을 수 있어요.\n이 기기에 보관한 채로 로그아웃할까요?\n(다시 로그인하면 이어서 올라가요)')){btn.disabled=false;return}
+    await signOut(auth);
+  }finally{btn.disabled=false}
+}
+
 onAuthStateChanged(auth,async user=>{
+ if(user||fbLive){const sw=swapScope(user?user.uid:'guest',dropAccountLocal);dropAccountLocal=false;if(sw)renderAll()}
  setAccount(user);updateBackupNote(); $('#loginBox')?.toggleAttribute('hidden',!!user); $('#logoutBtn')?.toggleAttribute('hidden',!user);
  $('#syncNowBtn').disabled=!user;
  $('#deleteCard')?.toggleAttribute('hidden',!user); if(!user)closeDeleteBox();
@@ -679,6 +732,7 @@ onAuthStateChanged(auth,async user=>{
    legacyRef=doc(db,'users',user.uid,'apps','yeobaek');
    setSyncStatus('로그인됨 · 동기화 중…');
    await syncNow(true); startRealtime(user);
+   await offerGuestImport();
  }else{
    if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null}
    daysCol=null; legacyRef=null; dirtyDates.clear(); setSyncStatus('이 기기에만 저장 중');
@@ -1147,7 +1201,7 @@ $('#deleteCancelBtn')?.addEventListener('click',closeDeleteBox);
 $('#deleteConfirmBtn')?.addEventListener('click',deleteAccount);
 $('#deletePassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')deleteAccount()});
 $('#loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter'){if(signupMode&&!$('#signupConfirm').value)$('#signupConfirm').focus();else $('#emailLoginBtn')?.click()}});
-$('#logoutBtn')?.addEventListener('click',()=>signOut(auth));
+$('#logoutBtn')?.addEventListener('click',doLogout);
 $('#syncNowBtn')?.addEventListener('click',()=>syncNow(false));
 $('#backupBtn')?.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('전체 백업 파일을 만들었어요.');try{localStorage.setItem('yeobaek-lastBackup',String(Date.now()))}catch{}updateBackupNote()});
 $('#restoreInput')?.addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const backup=JSON.parse(await file.text());if(!backup.entries)throw 0;const merged=mergeAll(collectLocalEntries(),backup.entries);putLocalEntries(merged);renderAll();toast('백업을 복원했어요.');scheduleCloudUpload(Object.keys(merged))}catch{alert('《여백》 백업 파일을 읽지 못했어요.')}e.target.value=''});
@@ -1212,6 +1266,6 @@ function showOnboarding(){
   const r=$('#replayTutorial');if(r)r.addEventListener('click',showOnboarding);
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-44');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-45');
 </script>
 </body></html>
