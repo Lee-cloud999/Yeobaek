@@ -303,7 +303,7 @@ html.dark .settingsCard{background:rgba(52,37,30,.85);border-color:#4a3329}
     <div class="deleteBtns"><button class="softBtn" id="deleteCancelBtn" type="button">취소</button><button class="softBtn dangerBtn" id="deleteConfirmBtn" type="button">영구 삭제</button></div>
   </div>
 </div>
-<div class="settingsNote"><a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
+<div class="settingsNote"><button class="linkBtn" id="replayTutorial" type="button">튜토리얼 다시보기</button> · <a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b><svg class="gear" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="16" cy="12" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="10" cy="18" r="2.4" fill="var(--bgi,#f8f0e7)"/></svg></b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
@@ -1180,13 +1180,9 @@ repairExistingLocalData();
 
 renderAll();
 
-// ===== 처음 열었을 때 안내 (3장) =====
-(function(){
-  let seen='';try{seen=localStorage.getItem('yeobaek-onboarded')||''}catch{}
-  if(seen)return;
-  let has=false;for(let i=0;i<localStorage.length;i++){if(/^yeobaek:\d{4}-/.test(localStorage.key(i)||'')){has=true;break}}
+// ===== 처음 열었을 때 안내 (3장) · 설정에서 다시 보기 =====
+function showOnboarding(){
   const done=()=>{try{localStorage.setItem('yeobaek-onboarded','1')}catch{}};
-  if(has){done();return}
   const ios=/iP(hone|ad|od)/.test(navigator.userAgent)&&!navigator.standalone&&!matchMedia('(display-mode: standalone)').matches;
   const pages=['스쳐가는 단어 하나면 충분해요.','기록은 이 기기에 저장돼요.','로그인하면 기기를 바꿔도 이어 쓸 수 있어요.'];
   if(ios)pages.push('공유 버튼에서 "홈 화면에 추가"를 누르면 앱처럼 열려요.');
@@ -1202,11 +1198,19 @@ renderAll();
     if(g('onbLater'))g('onbLater').onclick=close;
     if(g('onbLogin'))g('onbLogin').onclick=()=>{close();switchView('settings')};
   }
-  $('#onbText').addEventListener('click',()=>{if(n<pages.length-1){n++;draw()}});
-  $('#onbSkip').addEventListener('click',close);
+  $('#onbText').onclick=()=>{if(n<pages.length-1){n++;draw()}};
+  $('#onbSkip').onclick=close;
   draw();box.hidden=false;
+}
+(function(){
+  let seen='';try{seen=localStorage.getItem('yeobaek-onboarded')||''}catch{}
+  if(!seen){
+    let has=false;for(let i=0;i<localStorage.length;i++){if(/^yeobaek:\d{4}-/.test(localStorage.key(i)||'')){has=true;break}}
+    if(has){try{localStorage.setItem('yeobaek-onboarded','1')}catch{}}else showOnboarding();
+  }
+  const r=$('#replayTutorial');if(r)r.addEventListener('click',showOnboarding);
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-39');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-40');
 </script>
 </body></html>
