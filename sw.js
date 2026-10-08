@@ -1,11 +1,16 @@
-const CACHE='yeobaek-v7-40-tutorial-20261008';
+const CACHE='yeobaek-v7-41-maruburi-20261008';
 // 외부 자원(Firebase 코드, 서체)은 버전이 올라도 지우지 않고 따로 보관한다.
 const EXT='yeobaek-ext-v1';
-const APP=['./?v=7-40','./index.html?v=7-40','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const APP=['./?v=7-41','./index.html?v=7-41','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+
+const FONTS=['./fonts/MaruBuri-Regular.woff','./fonts/MaruBuri-SemiBold.woff','./fonts/MaruBuri-Bold.woff'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
-  event.waitUntil(caches.open(CACHE).then(c=>c.addAll(APP)));
+  // 글꼴은 크기가 커서 설치를 막지 않도록 따로, 실패해도 무시하고 받아 둔다.
+  const fonts=FONTS.map(f=>new Request(f));
+  const getFonts=caches.open(EXT).then(c=>Promise.all(fonts.map(r=>c.match(r).then(h=>h||fetch(r).then(res=>res.ok&&c.put(r,res))))).catch(()=>{}));
+  event.waitUntil(Promise.all([caches.open(CACHE).then(c=>c.addAll(APP)),getFonts.catch(()=>{})]));
 });
 self.addEventListener('activate',event=>{
   event.waitUntil(
@@ -29,10 +34,14 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=7-40',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=7-41',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=7-40'))
+      }).catch(()=>caches.match('./index.html?v=7-41'))
     );
+    return;
+  }
+  if(new URL(event.request.url).pathname.includes('/fonts/MaruBuri-')){
+    event.respondWith(caches.open(EXT).then(c=>c.match(event.request).then(hit=>hit||fetch(event.request).then(res=>{if(res.ok)c.put(event.request,res.clone());return res}))));
     return;
   }
   {

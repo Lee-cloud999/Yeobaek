@@ -16,17 +16,17 @@
 <style id="maruburi-font">
 @font-face{
   font-family:"MaruBuri";
-  src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2") format("woff2");
+  src:url("./fonts/MaruBuri-Regular.woff") format("woff");
   font-weight:400;font-style:normal;font-display:swap;
 }
 @font-face{
   font-family:"MaruBuri";
-  src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2") format("woff2");
+  src:url("./fonts/MaruBuri-SemiBold.woff") format("woff");
   font-weight:600;font-style:normal;font-display:swap;
 }
 @font-face{
   font-family:"MaruBuri";
-  src:url("https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2") format("woff2");
+  src:url("./fonts/MaruBuri-Bold.woff") format("woff");
   font-weight:700;font-style:normal;font-display:swap;
 }
 
@@ -1211,6 +1211,6 @@ function showOnboarding(){
   const r=$('#replayTutorial');if(r)r.addEventListener('click',showOnboarding);
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-40');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-41');
 </script>
 </body></html>
