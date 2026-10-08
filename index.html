@@ -230,9 +230,28 @@ mark{background:#efd29c}
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider, deleteUser, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { getFirestore, doc, collection, getDoc, getDocs, setDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+// v7.29: Firebase는 동적으로 불러온다. 오프라인이거나 불러오기에 실패해도 기록·활용 기능은 그대로 동작하고(이 기기에만 저장),
+// 연결이 돌아오면 새로고침해서 동기화를 다시 시작한다. 성공한 응답은 서비스 워커가 보관해 다음부터는 오프라인에서도 불러온다.
+const FB_BASE='https://www.gstatic.com/firebasejs/12.3.0/';
+let initializeApp,getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,reauthenticateWithCredential,EmailAuthProvider,deleteUser,onAuthStateChanged,signOut,getFirestore,doc,collection,getDoc,getDocs,setDoc,deleteDoc,writeBatch,onSnapshot,serverTimestamp;
+let fbLive=false;
+try{
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('firebase load timeout')),8000));
+  const [A,B,C]=await Promise.race([Promise.all([import(FB_BASE+'firebase-app.js'),import(FB_BASE+'firebase-auth.js'),import(FB_BASE+'firebase-firestore.js')]),timeout]);
+  ({initializeApp}=A);
+  ({getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,reauthenticateWithCredential,EmailAuthProvider,deleteUser,onAuthStateChanged,signOut}=B);
+  ({getFirestore,doc,collection,getDoc,getDocs,setDoc,deleteDoc,writeBatch,onSnapshot,serverTimestamp}=C);
+  fbLive=true;
+}catch(e){
+  console.warn('Firebase를 불러오지 못해 로컬 모드로 시작합니다.',e);
+  const off=()=>Promise.reject(Object.assign(new Error('offline'),{code:'auth/network-request-failed'}));
+  initializeApp=()=>({});getAuth=()=>({currentUser:null});getFirestore=()=>({});
+  signInWithEmailAndPassword=createUserWithEmailAndPassword=sendPasswordResetEmail=reauthenticateWithCredential=deleteUser=signOut=off;
+  EmailAuthProvider={credential:()=>({})};
+  onAuthStateChanged=(a,cb)=>{cb(null);return()=>{}};
+  doc=collection=()=>({});getDoc=getDocs=setDoc=deleteDoc=off;
+  writeBatch=()=>({set(){},delete(){},commit:off});onSnapshot=()=>()=>{};serverTimestamp=()=>0;
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyBTvUMPlKUUL6o8XfL-sJoy_Z6IqGrlPYc",
@@ -541,7 +560,7 @@ async function deleteAccount(){
    if(auth.currentUser){await syncNow(true);startRealtime(auth.currentUser)}
  }finally{btn.disabled=false}
 }
-window.addEventListener('online',()=>{if(auth.currentUser){setSyncStatus('연결됨 · 동기화 중…');syncNow(true)}});
+window.addEventListener('online',()=>{if(!fbLive){const typing=($('#sentence')?.value||$('#paragraph')?.value||$('#word')?.value||'').trim();if(!typing)location.reload();else toast('연결됐어요. 저장한 뒤 앱을 다시 열면 동기화돼요.');return}if(auth.currentUser){setSyncStatus('연결됨 · 동기화 중…');syncNow(true)}});
 window.addEventListener('offline',()=>setSyncStatus('오프라인 · 이 기기에 저장 중'));
 
 onAuthStateChanged(auth,async user=>{
@@ -1005,6 +1024,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-28');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-29');
 </script>
 </body></html>

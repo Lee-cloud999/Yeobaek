@@ -1,5 +1,7 @@
-const CACHE='yeobaek-v7-28-randbtn-20261005';
-const APP=['./?v=7-28','./index.html?v=7-28','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const CACHE='yeobaek-v7-29-offline-20261005';
+// 외부 자원(Firebase 코드, 서체)은 버전이 올라도 지우지 않고 따로 보관한다.
+const EXT='yeobaek-ext-v1';
+const APP=['./?v=7-29','./index.html?v=7-29','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -7,7 +9,7 @@ self.addEventListener('install',event=>{
 });
 self.addEventListener('activate',event=>{
   event.waitUntil(
-    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k!==EXT).map(k=>caches.delete(k))))
     .then(()=>self.clients.claim())
   );
 });
@@ -27,11 +29,21 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=7-28',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=7-29',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=7-28'))
+      }).catch(()=>caches.match('./index.html?v=7-29'))
     );
     return;
+  }
+  {
+    const host=new URL(event.request.url).hostname;
+    if(host==='www.gstatic.com'||host==='hangeul.pstatic.net'){
+      event.respondWith(caches.open(EXT).then(c=>c.match(event.request).then(hit=>{
+        const net=fetch(event.request).then(res=>{if(res&&(res.ok||res.type==='opaque'))c.put(event.request,res.clone());return res}).catch(()=>hit);
+        return hit||net;
+      })));
+      return;
+    }
   }
   event.respondWith(
     fetch(event.request).then(res=>{
