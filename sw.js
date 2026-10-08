@@ -1,7 +1,7 @@
-const CACHE='yeobaek-v7-31-dark-20261005';
+const CACHE='yeobaek-v7-32-backup-20261005';
 // 외부 자원(Firebase 코드, 서체)은 버전이 올라도 지우지 않고 따로 보관한다.
 const EXT='yeobaek-ext-v1';
-const APP=['./?v=7-31','./index.html?v=7-31','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const APP=['./?v=7-32','./index.html?v=7-32','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -29,9 +29,9 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=7-31',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=7-32',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=7-31'))
+      }).catch(()=>caches.match('./index.html?v=7-32'))
     );
     return;
   }

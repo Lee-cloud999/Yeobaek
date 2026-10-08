@@ -214,6 +214,10 @@ html.dark .settingsCard{background:rgba(52,37,30,.8)}html.dark .settingRow{borde
 html.dark .settingRow small,html.dark .linkBtn,html.dark .checkRow,html.dark .settingsNote,html.dark .emptyState,html.dark .stat span{color:#b89479}
 html.dark .loginBox input,html.dark .deleteBox input[type=password]{background:#2a1d17;border-color:#5b4234;color:#f0e1d3}
 html.dark .softBtn{background:#3b2a22;border-color:#5b4234;color:#e8d3bf}html.dark .primaryBtn{background:#5a4235}html.dark .dangerBtn{color:#e39a93;border-color:#7a4a45}
+.backupNote{margin:0 0 9px;padding:11px 13px;border-radius:14px;background:rgba(255,250,244,.78);border:1px solid #e0cfc0;display:flex;flex-direction:column;gap:9px}.backupNote[hidden]{display:none}
+.backupText b{display:block;font-size:14px;margin-bottom:3px}.backupText span{font-size:12.5px;line-height:1.55;color:#6b4636}.backupBtns{display:flex;gap:7px;flex-wrap:wrap}
+html.dark .backupNote{background:rgba(52,37,30,.85);border-color:#4a3329}html.dark .backupText span{color:#d9bfa8}
+.settingRow small+small{margin-top:3px}
 .themeBtns{display:flex;gap:6px;flex-wrap:wrap}
 </style>
 </head>
@@ -221,6 +225,7 @@ html.dark .softBtn{background:#3b2a22;border-color:#5b4234;color:#e8d3bf}html.da
 <header class="top"><div><div class="brand">여백</div><div class="intro">스쳐가는 생각을<br>남겨보세요.</div></div><div class="datebox"><div class="daterow"><button class="navbtn" id="prev">‹</button><div class="date" id="date">오늘</div><button class="navbtn" id="next">›</button></div><div class="quote" id="quote">쓰는 마음이,<br>조금은 가벼워지기를.</div></div></header>
 <main id="writeView" class="view active">
 <div id="recall" class="recall"></div>
+<div id="backupNote" class="backupNote" hidden></div>
 <section class="card wordcard"><div class="titleline"><div class="titlegroup"><div class="kicker">WORD</div><div class="nameRow"><h2>단어 기록</h2><span class="count" id="wordCount">오늘 0개</span></div></div><button class="plus" id="addWord">＋</button></div><p class="help">떠오르는 단어를 하나씩 남겨보세요.</p><input id="word" autocomplete="off" placeholder="단어를 입력하고 Enter"><div class="chips" id="recent"></div></section>
 <section class="card"><div class="titleline"><div><div class="kicker">SENTENCE</div><h2>문장 기록</h2></div><button class="plus" id="addSentence">＋</button></div><p class="help">기억하고 싶은 한 문장을 적어보세요.</p><div class="seedBanner" id="seedSentences" hidden role="status"><div class="seedBody"></div><button type="button" class="seedClose" aria-label="글감 닫기">×</button></div><textarea id="sentence" placeholder="문장을 입력해 주세요."></textarea><div class="todaySaved" id="todaySentences"></div></section>
 <section class="card paragraph"><div class="titleline"><div><div class="kicker">PARAGRAPH</div><h2>문단 기록</h2></div><button class="plus" id="addParagraph">＋</button></div><p class="help">생각을 조금 더 자유롭게 이어보세요.</p><div class="seedBanner" id="seedParagraphs" hidden role="status"><div class="seedBody"></div><button type="button" class="seedClose" aria-label="글감 닫기">×</button></div><textarea id="paragraph" placeholder="지금, 하고 싶은 이야기를 적어보세요."></textarea><div class="todaySaved" id="todayParagraphs"></div></section></main>
@@ -257,7 +262,7 @@ html.dark .softBtn{background:#3b2a22;border-color:#5b4234;color:#e8d3bf}html.da
 
 <div class="settingsCard">
   <div class="settingRow">
-    <div><b>전체 백업</b><small>모든 《여백》 기록을 JSON 파일로 저장합니다.</small></div>
+    <div><b>전체 백업</b><small>모든 《여백》 기록을 JSON 파일로 저장합니다.</small><small id="backupStatus"></small></div>
     <button class="softBtn" id="backupBtn">백업 파일 만들기</button>
   </div>
   <div class="settingRow">
@@ -433,6 +438,27 @@ function mergeAll(a={},b={}){
 }
 
 function setSyncStatus(text,kind=''){const e=$('#syncStatus');if(e){e.textContent=text;e.dataset.kind=kind}}
+// ===== 백업 안내: 로그인하지 않고 기록만 쌓이는 경우 알려준다 =====
+const BACKUP_GAP_DAYS=14,SNOOZE_DAYS=7;
+const lsGet=k=>{try{return localStorage.getItem(k)}catch{return null}};
+function backupDayCount(){let n=0;for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k))n++}return n}
+function agoText(ms){const d=Math.floor((Date.now()-ms)/86400000);return d<=0?'오늘':d+'일 전'}
+function updateBackupNote(){
+ const lb=Number(lsGet('yeobaek-lastBackup'))||0,logged=!!(auth&&auth.currentUser);
+ const st=$('#backupStatus');
+ if(st)st.textContent=logged?'로그인 중이라 기록이 클라우드에도 보관돼요.':(lb?'마지막 백업: '+agoText(lb):'아직 백업한 적이 없어요.');
+ const box=$('#backupNote');if(!box)return;
+ const days=backupDayCount(),snooze=Number(lsGet('yeobaek-backupSnooze'))||0;
+ const stale=!lb||(Date.now()-lb)>BACKUP_GAP_DAYS*86400000;
+ const show=!logged&&days>=3&&stale&&Date.now()>snooze;
+ box.hidden=!show;
+ if(show)box.innerHTML=`<div class="backupText"><b>기록을 지켜두세요</b><span>${days}일치 기록이 이 기기에만 있어요${lb?` (마지막 백업 ${agoText(lb)})`:''}. 로그인하거나 백업 파일을 만들어 두면 안전해요.</span></div><div class="backupBtns"><button type="button" class="tbtn primary" data-bk="go">설정에서 백업</button><button type="button" class="tbtn" data-bk="later">나중에</button></div>`;
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-bk]');if(!b)return;
+ if(b.dataset.bk==='go'){switchView('settings')}
+ else{try{localStorage.setItem('yeobaek-backupSnooze',String(Date.now()+SNOOZE_DAYS*86400000))}catch{}updateBackupNote()}
+});
 function setAccount(user){$('#accountStatus').textContent=user?(user.email||'로그인됨'):'로그인하지 않음'}
 
 // v6.5: 기록을 날짜별 문서(users/{uid}/apps/yeobaek/days/{날짜})로 나눠 저장한다.
@@ -622,7 +648,7 @@ window.addEventListener('online',()=>{if(!fbLive){const typing=($('#sentence')?.
 window.addEventListener('offline',()=>setSyncStatus('오프라인 · 이 기기에 저장 중'));
 
 onAuthStateChanged(auth,async user=>{
- setAccount(user); $('#loginBox')?.toggleAttribute('hidden',!!user); $('#logoutBtn')?.toggleAttribute('hidden',!user);
+ setAccount(user);updateBackupNote(); $('#loginBox')?.toggleAttribute('hidden',!!user); $('#logoutBtn')?.toggleAttribute('hidden',!user);
  $('#syncNowBtn').disabled=!user;
  $('#deleteCard')?.toggleAttribute('hidden',!user); if(!user)closeDeleteBox();
  if(user){
@@ -637,7 +663,7 @@ onAuthStateChanged(auth,async user=>{
 });
 
 function render(){
- const x=loadByDate(),dk=dateKey(current);renderRecall();
+ const x=loadByDate(),dk=dateKey(current);renderRecall();updateBackupNote();
  $('#date').textContent=(current.getMonth()+1)+'월 '+current.getDate()+'일 '+weekdays[current.getDay()];
  $('#wordCount').textContent='오늘 '+x.words.length+'개';
  $('#recent').innerHTML=x.words.map((w,i)=>wordChipHTML(dk,w,i,'chip','')).join('');
@@ -1082,7 +1108,7 @@ $('#deletePassword')?.addEventListener('keydown',e=>{if(e.key==='Enter')deleteAc
 $('#loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter'){if(signupMode&&!$('#signupConfirm').value)$('#signupConfirm').focus();else $('#emailLoginBtn')?.click()}});
 $('#logoutBtn')?.addEventListener('click',()=>signOut(auth));
 $('#syncNowBtn')?.addEventListener('click',()=>syncNow(false));
-$('#backupBtn')?.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('전체 백업 파일을 만들었어요.')});
+$('#backupBtn')?.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectBackupData(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yeobaek-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('전체 백업 파일을 만들었어요.');try{localStorage.setItem('yeobaek-lastBackup',String(Date.now()))}catch{}updateBackupNote()});
 $('#restoreInput')?.addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const backup=JSON.parse(await file.text());if(!backup.entries)throw 0;const merged=mergeAll(collectLocalEntries(),backup.entries);putLocalEntries(merged);renderAll();toast('백업을 복원했어요.');scheduleCloudUpload(Object.keys(merged))}catch{alert('《여백》 백업 파일을 읽지 못했어요.')}e.target.value=''});
 
 // Pull-to-refresh: keep current menu and perform cloud sync when logged in.
@@ -1114,6 +1140,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-31');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-32');
 </script>
 </body></html>
