@@ -1,7 +1,7 @@
-const CACHE='yeobaek-v7-46-scopereset-20261008';
+const CACHE='yeobaek-v7-47-precopy-20261008';
 // 외부 자원(Firebase 코드, 서체)은 버전이 올라도 지우지 않고 따로 보관한다.
 const EXT='yeobaek-ext-v1';
-const APP=['./?v=7-46','./index.html?v=7-46','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
+const APP=['./?v=7-47','./index.html?v=7-47','./privacy.html','./manifest.webmanifest','./icon.svg?v=4','./icon-180.png?v=4','./icon-192.png?v=4','./icon-512.png?v=4'];
 
 const FONTS=['./fonts/MaruBuri-Regular.woff','./fonts/MaruBuri-SemiBold.woff','./fonts/MaruBuri-Bold.woff'];
 
@@ -34,9 +34,9 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(event.request,{cache:'no-store'}).then(res=>{
         const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put('./index.html?v=7-46',copy));
+        caches.open(CACHE).then(c=>c.put('./index.html?v=7-47',copy));
         return res;
-      }).catch(()=>caches.match('./index.html?v=7-46'))
+      }).catch(()=>caches.match('./index.html?v=7-47'))
     );
     return;
   }
