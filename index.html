@@ -691,6 +691,13 @@ function swapScope(desired,drop=false){
   try{localStorage.setItem(SCOPE_KEY,desired)}catch{}
   return true;
 }
+function resetViewState(){
+  // 다른 계정(또는 로그인 전 화면)의 글이 화면 상태에 남아 보이지 않도록 지운다.
+  tl={piece:null,pieceLabel:'',word:null,wordList:[],pickWords:[],seed:null,pickSort:'recent',pickShown:15,randN:3,mixSel:[],mixPage:1,mixText:'',mixQ:'',cardText:'',cardDate:'',cardTheme:'mocha',cardRatio:'sq',cardQ:''};toolItems=null;
+  archiveQuery='';archivePage=1;editing=null;closedMonths=new Set();
+  const q=$('#archiveSearch');if(q){q.value='';const c=$('#archiveSearchClear');if(c)c.hidden=true}
+  $('#word').value='';
+}
 function askChoice(text,labels){
   return new Promise(res=>{
     $('#askText').textContent=text;
@@ -723,7 +730,7 @@ async function doLogout(){
 }
 
 onAuthStateChanged(auth,async user=>{
- if(user||fbLive){const sw=swapScope(user?user.uid:'guest',dropAccountLocal);dropAccountLocal=false;if(sw)renderAll()}
+ if(user||fbLive){const sw=swapScope(user?user.uid:'guest',dropAccountLocal);dropAccountLocal=false;if(sw){resetViewState();renderAll();$('#sentence').value=loadByDate().draftSentence||'';$('#paragraph').value=loadByDate().draftParagraph||'';updateSeed()}}
  setAccount(user);updateBackupNote(); $('#loginBox')?.toggleAttribute('hidden',!!user); $('#logoutBtn')?.toggleAttribute('hidden',!user);
  $('#syncNowBtn').disabled=!user;
  $('#deleteCard')?.toggleAttribute('hidden',!user); if(!user)closeDeleteBox();
@@ -1266,6 +1273,6 @@ function showOnboarding(){
   const r=$('#replayTutorial');if(r)r.addEventListener('click',showOnboarding);
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-45');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-46');
 </script>
 </body></html>
