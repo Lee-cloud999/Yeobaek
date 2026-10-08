@@ -235,6 +235,7 @@ html.dark .statBox{background:rgba(52,37,30,.85);border-color:#4a3329}html.dark 
 .onbBtns{display:flex;gap:8px;justify-content:center}.onbBtns .softBtn{min-width:96px}
 html.dark .onbCard{background:#2b1e18}html.dark .onbText{color:#e6cdb2}html.dark .onbSkip{color:#c99a78}html.dark .onbDots i{background:#4a3329}html.dark .onbDots i.on{background:#c99a78}
 html.dark .toast,html.dark .pullRefresh{color:#e6cdb2}html.dark .plus{color:#2b1e18}
+.tab b .gear{display:block;margin:0 auto}
 </style>
 </head>
 <body><div id="onb" class="onb" hidden><div class="onbCard"><button class="onbSkip" id="onbSkip" type="button">건너뛰기</button><div class="onbText" id="onbText"></div><div class="onbDots" id="onbDots"></div><div class="onbBtns" id="onbBtns"></div></div></div><div class="app">
@@ -300,7 +301,7 @@ html.dark .toast,html.dark .pullRefresh{color:#e6cdb2}html.dark .plus{color:#2b1
 <div class="settingsNote"><a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
-<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b>⚙</b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
+<nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b><svg class="gear" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.4"/><circle cx="12" cy="12" r="6.6"/><line x1="19.20" y1="12.00" x2="21.80" y2="12.00"/><line x1="17.09" y1="17.09" x2="18.93" y2="18.93"/><line x1="12.00" y1="19.20" x2="12.00" y2="21.80"/><line x1="6.91" y1="17.09" x2="5.07" y2="18.93"/><line x1="4.80" y1="12.00" x2="2.20" y2="12.00"/><line x1="6.91" y1="6.91" x2="5.07" y2="5.07"/><line x1="12.00" y1="4.80" x2="12.00" y2="2.20"/><line x1="17.09" y1="6.91" x2="18.93" y2="5.07"/></svg></b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
 
 <script type="module">
 // v7.29: Firebase는 동적으로 불러온다. 오프라인이거나 불러오기에 실패해도 기록·활용 기능은 그대로 동작하고(이 기기에만 저장),
@@ -1201,6 +1202,6 @@ renderAll();
   draw();box.hidden=false;
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-36');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-37');
 </script>
 </body></html>
