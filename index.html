@@ -241,6 +241,7 @@ html.dark{--bgi:#241915}
 .settingRow{padding:13px 0}.settingRow b{font-size:15px;font-weight:600}.settingRow small{font-size:12px;margin-top:4px}
 .settingsNote{font-size:11.5px}.softBtn{padding:8px 15px;font-size:13px}.linkBtn{font-size:12px}.checkRow{font-size:12px}
 html.dark .settingsCard{background:rgba(52,37,30,.85);border-color:#4a3329}
+.recallLabel,.todaySavedLabel{font-family:"MaruBuri","AppleMyungjo","Noto Serif KR","Batang",serif;font-weight:600;font-size:11px;letter-spacing:.2px}
 </style>
 </head>
 <body><div id="ask" class="onb" hidden style="z-index:95"><div class="onbCard" style="min-height:0"><div class="onbText" id="askText" style="font-size:17px;cursor:default;white-space:pre-line;padding:6px 0 18px"></div><div class="onbBtns" id="askBtns" style="flex-wrap:wrap"></div></div></div><div id="onb" class="onb" hidden><div class="onbCard"><button class="onbSkip" id="onbSkip" type="button">건너뛰기</button><div class="onbText" id="onbText"></div><div class="onbDots" id="onbDots"></div><div class="onbBtns" id="onbBtns"></div></div></div><div class="app">
@@ -1296,6 +1297,6 @@ function showOnboarding(){
   const r=$('#replayTutorial');if(r)r.addEventListener('click',showOnboarding);
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-48');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-49');
 </script>
 </body></html>
