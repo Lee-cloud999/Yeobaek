@@ -219,6 +219,14 @@ html.dark .softBtn{background:#3b2a22;border-color:#5b4234;color:#e8d3bf}html.da
 html.dark .backupNote{background:rgba(52,37,30,.85);border-color:#4a3329}html.dark .backupText span{color:#d9bfa8}
 .settingRow small+small{margin-top:3px}
 .themeBtns{display:flex;gap:6px;flex-wrap:wrap}
+.statStreak{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:9px}
+.statBox{background:rgba(255,250,244,.78);border:1px solid #e0cfc0;border-radius:15px;padding:14px 14px 12px;margin-top:9px}
+.statStreak .statBox{margin-top:0;text-align:center}.statBox h3{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--muted)}
+.statBox .big{font-size:24px;font-weight:500;display:block}.statBox .lbl{font-size:11px;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:92px}.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;color:var(--muted)}
+.bars .b i{display:block;width:100%;max-width:30px;background:#c9a98f;border-radius:5px 5px 2px 2px;min-height:2px}.bars .b em{font-style:normal;margin-top:4px}.bars .b u{text-decoration:none;font-size:10px;margin-bottom:2px}
+.topWords{display:flex;flex-wrap:wrap;gap:6px}.topWords span{background:#dcc3ae;border-radius:999px;padding:5px 11px;font-size:13px}.topWords small{color:var(--muted);margin-left:4px;font-size:11px}
+html.dark .statBox{background:rgba(52,37,30,.85);border-color:#4a3329}html.dark .bars .b i{background:#c99a78}html.dark .topWords span{background:#46332a}
 </style>
 </head>
 <body><div class="app">
@@ -231,7 +239,7 @@ html.dark .backupNote{background:rgba(52,37,30,.85);border-color:#4a3329}html.da
 <section class="card paragraph"><div class="titleline"><div><div class="kicker">PARAGRAPH</div><h2>문단 기록</h2></div><button class="plus" id="addParagraph">＋</button></div><p class="help">생각을 조금 더 자유롭게 이어보세요.</p><div class="seedBanner" id="seedParagraphs" hidden role="status"><div class="seedBody"></div><button type="button" class="seedClose" aria-label="글감 닫기">×</button></div><textarea id="paragraph" placeholder="지금, 하고 싶은 이야기를 적어보세요."></textarea><div class="todaySaved" id="todayParagraphs"></div></section></main>
 <section id="archiveView" class="view subview"><div class="pagehead"><h2>모아보기</h2><p>날짜별로 남긴 단어, 문장, 문단을 한곳에서 봅니다.</p></div><div class="searchBox"><input id="archiveSearch" type="search" autocomplete="off" placeholder="기록 검색" aria-label="기록 검색"><button type="button" id="archiveSearchClear" class="searchClear" aria-label="검색어 지우기" hidden>×</button></div><div class="filterRow" id="archiveFilter"><button type="button" class="fchip on" data-f="all">전체</button><button type="button" class="fchip" data-f="words">단어</button><button type="button" class="fchip" data-f="sentences">문장</button><button type="button" class="fchip" data-f="paragraphs">문단</button><button type="button" class="fchip" data-f="fav" aria-label="즐겨찾기">★</button></div><div id="archiveInfo" class="archiveInfo"></div><div id="archiveList"></div><nav id="archivePager" class="pager" aria-label="페이지"></nav></section>
 <section id="toolsView" class="view subview"><div class="pagehead"><h2>활용</h2><p>모아 둔 기록을 다시 꺼내 쓰고, 이어 붙이고, 카드로 만들어요.</p></div><div id="toolsBody"></div></section>
-<section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div></section>
+<section id="statsView" class="view subview"><div class="pagehead"><h2>통계</h2><p>여백에 남긴 기록을 가볍게 살펴봅니다.</p></div><div class="statsGrid"><div class="stat"><strong id="statDays">0</strong><span>기록한 날</span></div><div class="stat"><strong id="statWords">0</strong><span>단어</span></div><div class="stat"><strong id="statSentences">0</strong><span>문장</span></div><div class="stat"><strong id="statParagraphs">0</strong><span>문단</span></div></div><div id="statsExtra"></div></section>
 <section id="settingsView" class="view subview">
 <div class="subHeader"><h2>설정</h2><p>이메일 계정으로 기록을 여러 기기에 이어서 보관하세요.</p></div>
 
@@ -836,20 +844,38 @@ _as.addEventListener('input',()=>{archiveQuery=_as.value;archivePage=1;_ac.hidde
 _ac.addEventListener('click',()=>{_as.value='';archiveQuery='';archivePage=1;_ac.hidden=true;renderArchive();_as.focus()});
 function renderStats(){
   let days=0,words=0,sentences=0,paragraphs=0;
+  const active=new Set(),wd=[0,0,0,0,0,0,0],mon={},wc={};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
     if(!k||!/^yeobaek:\d{4}-\d{2}-\d{2}$/.test(k))continue;
     try{
       const date=k.slice(8),x=normalize(JSON.parse(localStorage.getItem(k)||'{}'),date);
       const w=x.words.length,s=x.sentences.length,p=x.paragraphs.length;
-      if(w||s||p)days++;
+      if(w||s||p){days++;active.add(date);const d=new Date(date+'T00:00:00');wd[d.getDay()]++;const m=date.slice(0,7);mon[m]=(mon[m]||0)+w+s+p}
       words+=w;sentences+=s;paragraphs+=p;
+      x.words.forEach(t=>{t=String(t).trim();if(t)wc[t]=(wc[t]||0)+1});
     }catch(e){console.warn('통계에서 건너뛴 기록',k,e)}
   }
   $('#statDays').textContent=days;
   $('#statWords').textContent=words;
   $('#statSentences').textContent=sentences;
   $('#statParagraphs').textContent=paragraphs;
+  const box=$('#statsExtra');if(!box)return;
+  if(!days){box.innerHTML='';return}
+  const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  // 연속 기록 (오늘 기록이 없으면 어제부터 센다)
+  let cur=0,c=new Date();c.setHours(12);if(!active.has(key(c)))c.setDate(c.getDate()-1);
+  while(active.has(key(c))){cur++;c.setDate(c.getDate()-1)}
+  const sorted=[...active].sort();let best=0,run=0,prev=null;
+  for(const dt of sorted){const d=new Date(dt+'T12:00:00');if(prev&&Math.round((d-prev)/864e5)===1)run++;else run=1;best=Math.max(best,run);prev=d}
+  const bars=(arr)=>{const mx=Math.max(1,...arr.map(a=>a[1]));return '<div class="bars">'+arr.map(a=>'<div class="b"><u>'+(a[1]||'')+'</u><i style="height:'+Math.round(a[1]/mx*62)+'px"></i><em>'+a[0]+'</em></div>').join('')+'</div>'};
+  const names=['일','월','화','수','목','금','토'];
+  const months=[];const n=new Date();n.setDate(1);for(let i=5;i>=0;i--){const d=new Date(n.getFullYear(),n.getMonth()-i,1);const m=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');months.push([(d.getMonth()+1)+'월',mon[m]||0])}
+  const top=Object.entries(wc).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ko')).filter(e=>e[1]>=2).slice(0,12);
+  box.innerHTML='<div class="statStreak"><div class="statBox"><span class="big">'+cur+'일</span><span class="lbl">연속 기록 중</span></div><div class="statBox"><span class="big">'+best+'일</span><span class="lbl">최장 연속 기록</span></div></div>'
+   +'<div class="statBox"><h3>요일별 기록한 날</h3>'+bars(names.map((nm,i)=>[nm,wd[i]]))+'</div>'
+   +'<div class="statBox"><h3>최근 6개월 기록 수</h3>'+bars(months)+'</div>'
+   +(top.length?'<div class="statBox"><h3>자주 쓴 단어</h3><div class="topWords">'+top.map(e=>'<span>'+esc(e[0])+'<small>'+e[1]+'</small></span>').join('')+'</div></div>':'');
 }
 function renderAll(){render();renderArchive();renderStats();const tv=$('#toolsView');if(tv&&tv.classList.contains('active')&&!tv.contains(document.activeElement))renderTools()}
 
@@ -1140,6 +1166,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-32');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-33');
 </script>
 </body></html>
