@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f8f0e7">
-<script>(function(){try{var m=localStorage.getItem('yeobaek-theme')||'auto';var d=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark');var t=document.querySelector('meta[name=theme-color]');if(t)t.content='#1b110d'}}catch(e){}})()</script>
+<script>(function(){try{var m=localStorage.getItem('yeobaek-theme')||'light';var d=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark');var t=document.querySelector('meta[name=theme-color]');if(t)t.content='#1b110d'}}catch(e){}})()</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="여백">
@@ -880,7 +880,7 @@ function renderStats(){
 function renderAll(){render();renderArchive();renderStats();const tv=$('#toolsView');if(tv&&tv.classList.contains('active')&&!tv.contains(document.activeElement))renderTools()}
 
 // ===== 화면 테마 (자동 / 라이트 / 다크) =====
-function themeMode(){try{return localStorage.getItem('yeobaek-theme')||'auto'}catch{return 'auto'}}
+function themeMode(){try{return localStorage.getItem('yeobaek-theme')||'light'}catch{return 'light'}}
 function applyTheme(mode,save){
  if(save){try{localStorage.setItem('yeobaek-theme',mode)}catch{}}
  const dark=mode==='dark'||(mode==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
@@ -1166,6 +1166,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-33');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-34');
 </script>
 </body></html>
