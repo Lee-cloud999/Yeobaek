@@ -304,7 +304,7 @@ html.dark .settingsCard{background:rgba(52,37,30,.85);border-color:#4a3329}
   </div>
 </div>
 <div class="settingsNote"><button class="linkBtn" id="replayTutorial" type="button">튜토리얼 다시보기</button> · <a href="./privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></div>
-<div class="settingsNote">이 앱에는 네이버에서 제공한 마루부리 글꼴이 적용되어 있습니다. · <a href="./fonts/LICENSE-MaruBuri-OFL.txt" target="_blank" rel="noopener">글꼴 라이선스</a></div>
+<div class="settingsNote">이 앱에는 네이버에서 제공한 마루부리 글꼴을 기반으로 형식을 변환하고 일부 글자를 제외한 수정본 ‘Yeobaek Serif’가 적용되어 있습니다. · <a href="./fonts/LICENSE-MaruBuri-OFL.txt" target="_blank" rel="noopener">글꼴 라이선스</a></div>
 <div class="settingsNote">로그인하지 않아도 기록은 이 기기에 저장됩니다. 로그인하면 기존 로컬 기록과 클라우드 기록을 합쳐 동기화합니다.</div>
 </section>
 <nav class="bottom"><button class="tab active" data-view="write"><b>✎</b>쓰기</button><button class="tab" data-view="archive"><b>▤</b>모아보기</button><button class="tab" data-view="tools"><b>✦</b>활용</button><button class="tab" data-view="stats"><b>▥</b>통계</button><button class="tab" data-view="settings"><b><svg class="gear" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="8" cy="6" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="16" cy="12" r="2.4" fill="var(--bgi,#f8f0e7)"/><circle cx="10" cy="18" r="2.4" fill="var(--bgi,#f8f0e7)"/></svg></b>설정</button></nav></div><div class="toast" id="toast"></div><div class="pullRefresh" id="pullRefresh">아래로 당겨 새로고침</div>
@@ -1212,6 +1212,6 @@ function showOnboarding(){
   const r=$('#replayTutorial');if(r)r.addEventListener('click',showOnboarding);
 })();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-42');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-43');
 </script>
 </body></html>
