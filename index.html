@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f8f0e7">
+<script>(function(){try{var m=localStorage.getItem('yeobaek-theme')||'auto';var d=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark');var t=document.querySelector('meta[name=theme-color]');if(t)t.content='#1b110d'}}catch(e){}})()</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="여백">
@@ -171,6 +172,49 @@ mark{background:#efd29c}
 .chipRow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .cardWrap{margin-top:12px;border-radius:12px;overflow:hidden;background:#efe5dc;line-height:0}.cardWrap canvas{display:block;width:100%;height:auto;max-height:70vh;object-fit:contain;margin:0 auto}
 #toolsView input[type=search]{height:38px;margin-top:2px;background:rgba(255,252,248,.9);-webkit-appearance:none;appearance:none}
+html.dark{color-scheme:dark;--ink:#f0e1d3;--muted:#c9a68c;--line:#5b4234;--brown:#c99a78;--chip:#5a4235}
+html.dark,html.dark body{background:#1b110d}
+html.dark .app{background:linear-gradient(#2b1e18,#241915)}
+html.dark .quote{border-top-color:#5b4234}
+html.dark .navbtn{background:#4a3329;color:#f0e1d3}
+html.dark .kicker,html.dark .recallLabel,html.dark .archiveLabel,html.dark .todaySavedLabel{color:#c9a68c}
+html.dark .count,html.dark .help{color:#d9bfa8}
+html.dark .card:nth-of-type(1),html.dark .card:nth-of-type(3){background:#3b2a22}
+html.dark .card:nth-of-type(2){background:#46332a}
+html.dark input,html.dark textarea{background:#2a1d17;border-color:#5b4234;color:#f0e1d3}
+html.dark input::placeholder,html.dark textarea::placeholder{color:#8f7261}
+html.dark .record{background:#33241d}
+html.dark #todaySentences .record,html.dark #todayParagraphs .record,html.dark .archiveGroup.gS .record,html.dark .archiveGroup.gP .record{background:#5a4235}
+html.dark .chip,html.dark .wordRecord,html.dark .sameChip{background:#5a4235;color:#f0e1d3}
+html.dark .plus{background:#c99a78;color:#2a1810}
+html.dark .bottom{background:rgba(36,25,21,.97);border-top-color:#5b4234}
+html.dark .tab{color:#b89479}html.dark .tab.active{color:#f0e1d3}
+html.dark .del,html.dark .editBtn,html.dark .favBtn,html.dark .copyBtn,html.dark .recAct .favBtn,html.dark .recAct .copyBtn{color:#c9a68c}html.dark .recAct .favBtn.on{color:#e0a25c}
+html.dark .archiveDay,html.dark .settingCard,html.dark .stat,html.dark .toolCard{background:rgba(52,37,30,.85);border-color:#4a3329}
+html.dark .archiveGroup.gW,html.dark .archiveGroup.gP{background:#3b2a22}html.dark .archiveGroup.gS{background:#46332a}
+html.dark .archiveDate{color:#f0e1d3}
+html.dark .monthHead{background:#3b2a22;color:#f0e1d3}html.dark .monthHead small{color:#c9a68c}html.dark .monthHead .arrow{color:#c99a78}
+html.dark .fchip{background:#3b2a22;color:#e8d3bf}html.dark .fchip.on{background:#c99a78;color:#2a1810}
+html.dark .pager button{background:#3b2a22;color:#f0e1d3}html.dark .pager button.on{background:#c99a78;color:#2a1810}
+html.dark .recallItem{border-left-color:#8a6450;background:rgba(52,37,30,.8)}html.dark .recallText{color:#f0e1d3}
+html.dark .searchClear{color:#c9a68c}html.dark .archiveInfo{color:#d9bfa8}
+html.dark .toast{background:#e8d3bf;color:#2a1810}html.dark .toastBtn{background:rgba(42,24,16,.16);color:#2a1810}
+html.dark .wEditSave{background:#c99a78;color:#2a1810}html.dark .wEditCancel{background:rgba(240,225,211,.14);color:#f0e1d3}
+html.dark .editBtns .save{background:#c99a78;color:#2a1810}html.dark .editBtns button{background:#4a3329;color:#f0e1d3}
+html.dark mark{background:#8a6a2e;color:#fff3d9}
+html.dark .seedBanner{background:#6b4636;color:#f0e1d3}html.dark .seedChip{background:rgba(240,225,211,.16);color:#f0e1d3}html.dark .seedClose{background:rgba(240,225,211,.16);color:#f0e1d3}
+html.dark .toolSub,html.dark .pieceMeta,html.dark .toolEmpty,html.dark .pickDate{color:#c9a68c}html.dark .mixInfo,html.dark .sameLine{color:#d9bfa8}
+html.dark .pieceText{border-left-color:#8a6450}
+html.dark .tbtn{background:#4a3329;color:#f0e1d3}html.dark .tbtn.primary{background:#c99a78;color:#2a1810}html.dark .tbtn.outlined{background:transparent;border-color:#c99a78;color:#e8d3bf}
+html.dark .pickChip{background:#3b2a22;color:#f0e1d3}html.dark .pickChip.on{background:#c99a78;color:#2a1810}
+html.dark .pickRow{background:#33241d;color:#f0e1d3}html.dark .pickRow.on{background:#5a4235}
+html.dark .pickNo{background:rgba(240,225,211,.14);color:#f0e1d3}html.dark .pickRow.on .pickNo{background:#c99a78;color:#2a1810}
+html.dark .cardWrap{background:#33241d}html.dark #toolsView input[type=search]{background:#2a1d17}
+html.dark .settingsCard{background:rgba(52,37,30,.8)}html.dark .settingRow{border-bottom-color:rgba(240,225,211,.12)}html.dark .loginBox{border-bottom-color:rgba(240,225,211,.12)}
+html.dark .settingRow small,html.dark .linkBtn,html.dark .checkRow,html.dark .settingsNote,html.dark .emptyState,html.dark .stat span{color:#b89479}
+html.dark .loginBox input,html.dark .deleteBox input[type=password]{background:#2a1d17;border-color:#5b4234;color:#f0e1d3}
+html.dark .softBtn{background:#3b2a22;border-color:#5b4234;color:#e8d3bf}html.dark .primaryBtn{background:#5a4235}html.dark .dangerBtn{color:#e39a93;border-color:#7a4a45}
+.themeBtns{display:flex;gap:6px;flex-wrap:wrap}
 </style>
 </head>
 <body><div class="app">
@@ -201,6 +245,13 @@ mark{background:#efd29c}
   <div class="settingRow">
     <div><b>동기화</b><small id="syncStatus">상태 확인 중…</small></div>
     <button class="softBtn" id="syncNowBtn" disabled>지금 동기화</button>
+  </div>
+</div>
+
+<div class="settingsCard">
+  <div class="settingRow">
+    <div><b>화면 테마</b><small id="themeStatus">기기 설정을 따라가요.</small></div>
+    <div class="themeBtns" id="themeBtns"><button type="button" class="softBtn" data-theme="auto">자동</button><button type="button" class="softBtn" data-theme="light">라이트</button><button type="button" class="softBtn" data-theme="dark">다크</button></div>
   </div>
 </div>
 
@@ -776,6 +827,20 @@ function renderStats(){
 }
 function renderAll(){render();renderArchive();renderStats();const tv=$('#toolsView');if(tv&&tv.classList.contains('active')&&!tv.contains(document.activeElement))renderTools()}
 
+// ===== 화면 테마 (자동 / 라이트 / 다크) =====
+function themeMode(){try{return localStorage.getItem('yeobaek-theme')||'auto'}catch{return 'auto'}}
+function applyTheme(mode,save){
+ if(save){try{localStorage.setItem('yeobaek-theme',mode)}catch{}}
+ const dark=mode==='dark'||(mode==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
+ document.documentElement.classList.toggle('dark',dark);
+ const m=document.querySelector('meta[name=theme-color]');if(m)m.content=dark?'#1b110d':'#f8f0e7';
+ document.querySelectorAll('#themeBtns .softBtn').forEach(b=>b.classList.toggle('primaryBtn',b.dataset.theme===mode));
+ const st=$('#themeStatus');if(st)st.textContent=mode==='auto'?'기기 설정을 따라가요.':mode==='dark'?'다크 모드로 고정했어요.':'라이트 모드로 고정했어요.';
+}
+document.querySelectorAll('#themeBtns .softBtn').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.theme,true)));
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themeMode()==='auto')applyTheme('auto',false)})}catch{}
+applyTheme(themeMode(),false);
+
 // ===== v7.20 활용: 오늘의 한 조각 · 단어 연상 · 단어로 글쓰기 · 문장 이어 붙이기 · 문장 카드 이미지 =====
 const CARD_THEMES={mocha:{n:'모카',bg:'#f6ede3',bg2:'#efdfd0',ink:'#3b271d',sub:'#8c5f47',line:'#c4a48b'},dark:{n:'다크',bg:'#2c1f19',bg2:'#241915',ink:'#f0e1d3',sub:'#c9a68c',line:'#6a4a3b'},rose:{n:'로즈',bg:'#f1e3de',bg2:'#e8d4cd',ink:'#4a3329',sub:'#9a6f63',line:'#cba79d'},sage:{n:'세이지',bg:'#e8ecde',bg2:'#dbe2cf',ink:'#38422f',sub:'#6f7d60',line:'#aebb9e'}};
 const CARD_RATIO={sq:{w:1080,h:1080,n:'정사각'},tall:{w:1080,h:1350,n:'세로 4:5'},story:{w:1080,h:1920,n:'스토리 9:16'}};
@@ -1049,6 +1114,6 @@ repairExistingLocalData();
 
 renderAll();
 const savedView=sessionStorage.getItem('yeobaek:activeView');if(savedView)switchView(savedView,false);
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-30');
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js?v=7-31');
 </script>
 </body></html>
